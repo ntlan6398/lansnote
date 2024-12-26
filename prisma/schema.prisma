@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id       String    @id @default(uuid())
+  email    String    @unique
+  lists    List[]
+  Password Password?
+  subjects Subject[]
+  terms    Term[]
+}
+
+model Password {
+  id        String  @id @default(uuid())
+  salt      String
+  hash      String
+  accountId String  @unique
+  Account   Account @relation(fields: [accountId], references: [id])
+}
+
+model Subject {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  accountId String
+  lessons   Lesson[]
+  Account   Account  @relation(fields: [accountId], references: [id])
+}
+
+model List {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  accountId String
+  Account   Account  @relation(fields: [accountId], references: [id])
+  terms     Term[]
+}
+
+model Lesson {
+  id         String   @id @default(uuid())
+  title      String
+  startDate  DateTime
+  reviewDate DateTime
+  onTrack    Int      @default(0)
+  subjectId  Int
+  comments   Json
+  content    String
+  subjects   Subject  @relation(fields: [subjectId], references: [id])
+}
+
+model Term {
+  id         String    @id @default(uuid())
+  term       String
+  type       String
+  definition String
+  example    String
+  status     String    @default("new")
+  createdAt  DateTime  @default(now())
+  lastReview DateTime  @default(now())
+  nextReview DateTime  @default(now())
+  interval   Int       @default(0)
+  repetition Int       @default(0)
+  accountId  String
+  efactor    Float     @default(2.5)
+  listId     Int
+  Account    Account   @relation(fields: [accountId], references: [id])
+  List       List      @relation(fields: [listId], references: [id])
+}
