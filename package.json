@@ -4,7 +4,7 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build": "npx prisma generate && NODE_ENV=production vite build && vite build --ssr",
+    "build": "prisma generate && NODE_ENV=production vite build && vite build --ssr",
     "dev": "vite dev",
     "start": "NODE_ENV=production remix-serve ./build/server/index.js",
     "migrate": "npx prisma migrate dev",
