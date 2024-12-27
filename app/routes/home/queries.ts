@@ -51,7 +51,6 @@ export async function getHomeData(userId: string) {
       accountId: userId,
     },
   });
-  console.log(subjects);
   const lists = await prisma.list.findMany({
     where: {
       accountId: userId,

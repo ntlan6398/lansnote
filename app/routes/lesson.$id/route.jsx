@@ -507,7 +507,7 @@ export default function Lesson() {
               className="bg-blue-50"
               type="date"
               id="startDate"
-              value={dayjs(lesson.startDate).format("YYYY-MM-DD")}
+              value={dayjs(lesson.startDate).toISOString().split("T")[0]}
               onChange={(e) => {
                 if (lesson.onTrack === 0) {
                   setLesson({
@@ -542,7 +542,7 @@ export default function Lesson() {
               className="bg-blue-50 flex-1"
               type="date"
               id="reviewDate"
-              value={dayjs(lesson.reviewDate).format("YYYY-MM-DD")}
+              value={dayjs(lesson.reviewDate).toISOString().split("T")[0]}
             />
           </div>
           <div className="w-full grid grid-cols-2 md:grid-cols-7 gap-1 md:gap-2 place-items-center">

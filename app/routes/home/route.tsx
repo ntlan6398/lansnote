@@ -53,14 +53,16 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function Projects() {
   const { subjects, lists, lessons, terms } = useLoaderData<typeof loader>();
   const now = dayjs().format("YYYY-MM-DD");
-  const today = new Date(now).toISOString().split("T")[0];
   const classifiedLessons = lessons.reduce(
     (acc: any, lesson) => {
+      const review = lesson.reviewDate.split("T")[0];
+
       const diff = Math.ceil(
-        (new Date(today).getTime() - new Date(lesson.reviewDate).getTime()) /
+        (new Date(now).getTime() - new Date(review).getTime()) /
           (1000 * 60 * 60 * 24),
       );
       if (diff === 0) {
+        console.log(review);
         acc.today.push(lesson);
       } else if (diff === 1) {
         acc.yesterday.push(lesson);
@@ -81,6 +83,7 @@ export default function Projects() {
       nextThirtyDays: [],
     },
   );
+  console.log(classifiedLessons);
   const [activeTab, setActiveTab] = useState("lessons");
 
   const lessonCards = [
