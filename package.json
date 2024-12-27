@@ -1,10 +1,10 @@
 {
-  "name": "Trellix",
+  "name": "Lansnote",
   "private": true,
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build": "prisma generate && NODE_ENV=production vite build && vite build --ssr",
+    "build": "npx prisma generate && NODE_ENV=production vite build && vite build --ssr",
     "dev": "vite dev",
     "start": "NODE_ENV=production remix-serve ./build/server/index.js",
     "migrate": "npx prisma migrate dev",
