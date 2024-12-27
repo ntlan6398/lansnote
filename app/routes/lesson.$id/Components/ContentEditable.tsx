@@ -24,6 +24,11 @@ export default function ContentEditable({ content = "" }: { content: string }) {
       editContainer.innerHTML = content;
     }
   }, []);
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData("text/plain");
+    document.execCommand("insertText", false, text);
+  };
   const [show, setShow] = useState(false);
   const [showMore, setShowMore] = useState(false);
 
@@ -49,6 +54,7 @@ export default function ContentEditable({ content = "" }: { content: string }) {
     if (!editors || editors.length === 1) {
       const container = document.createElement("div");
       container.setAttribute("contentEditable", "true");
+      container.setAttribute("onPaste", "handlePaste(event)");
       container.className =
         "focus:outline-none focus:ring focus:border-blue-500 rounded w-full max-w-full block break-words break-keep h-auto overflow-hidden px-10";
       // Insert new column before or after
@@ -159,6 +165,7 @@ export default function ContentEditable({ content = "" }: { content: string }) {
       <div className="flex flex-col sm:grid sm:grid-cols-12 gap-1 sm:gap-2 w-full edit-container">
         <div
           contentEditable="true"
+          onPaste={handlePaste}
           style={{ gridColumnStart: 1, gridColumnEnd: 13 }}
           className="focus:outline-none focus:ring focus:border-blue-500 rounded w-full max-w-full block break-words break-keep h-auto overflow-hidden px-2 sm:px-6 md:px-10 mb-2 sm:mb-0"
         ></div>

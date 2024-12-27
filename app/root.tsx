@@ -115,7 +115,7 @@ export default function App() {
         <input
           type="text"
           placeholder={placeHolder}
-          className="w-full p-2 rounded-lg bg-[#DBE2EF]"
+          className="w-full p-2 rounded-lg bg-[#DBE2EF] text-[#112D4E]"
         />
         <button
           className="bg-[#3F72AF] text-[] p-2 rounded-lg"
@@ -214,7 +214,7 @@ export default function App() {
             <div className="space-y-2 font-medium">
               <div className="flex items-center justify-between rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                 <Link
-                  className="flex items-center p-2 gap-2  rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="flex items-center p-2 gap-2  rounded-lg hover:bg-gray-100 hover:text-[#112D4E]"
                   to="/home"
                   onClick={() => {
                     setMenuOpen(false);
@@ -225,8 +225,8 @@ export default function App() {
                 </Link>
               </div>
 
-              <button className="flex w-full items-center justify-between  rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                <div className="flex items-center p-2 gap-2  rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+              <button className="flex w-full items-center justify-between  rounded-lg hover:bg-gray-100 ">
+                <div className="flex items-center p-2 gap-2  rounded-lg hover:bg-gray-100 hover:text-[#112D4E]">
                   <FiList />
                   <span className="ml-3">List</span>
                 </div>
@@ -256,10 +256,10 @@ export default function App() {
                 {lists?.map((term) => (
                   <div
                     key={term.id}
-                    className="ml-5 flex items-center justify-between rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="ml-5 flex items-center justify-between rounded-lg hover:bg-gray-100 hover:text-[#112D4E]"
                   >
                     <Link
-                      className="flex items-center p-2 gap-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className="flex items-center p-2 gap-2 rounded-lg hover:bg-gray-100 hover:text-[#112D4E]"
                       to={`/list/${term.id}?page=1`}
                       onClick={() => {
                         setMenuOpen(false);
@@ -272,8 +272,8 @@ export default function App() {
                 ))}
               </div>
 
-              <button className="w-full flex items-center justify-between rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                <div className="flex items-center p-2 gap-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+              <button className="w-full flex items-center justify-between rounded-lg hover:bg-gray-100 hover:text-[#112D4E]">
+                <div className="flex items-center p-2 gap-2 rounded-lg hover:bg-gray-100 hover:text-[#112D4E]">
                   <FiBook />
                   <span className="ml-3">Subjects</span>
                 </div>
@@ -303,10 +303,10 @@ export default function App() {
                 {subjects?.map((subject) => (
                   <div
                     key={subject.id}
-                    className="ml-5 flex items-center justify-between rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="ml-5 flex items-center justify-between rounded-lg hover:bg-gray-100 hover:text-[#112D4E]"
                   >
                     <Link
-                      className="flex items-center p-2 gap-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className="flex items-center p-2 gap-2 rounded-lg hover:bg-gray-100 hover:text-[#112D4E]"
                       to={`/subject/${subject.id}`}
                       onClick={() => {
                         setMenuOpen(false);
