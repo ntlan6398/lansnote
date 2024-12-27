@@ -9,6 +9,7 @@ import { requireAuthCookie } from "~/auth/auth";
 import LessonBoard from "./components/LesonBoard";
 import TermDisplay from "./components/TermDisplay";
 import { deleteLesson, getHomeData, practiceTerm } from "./queries";
+import dayjs from "dayjs";
 export const meta = () => {
   return [{ title: "Home" }];
 };
@@ -51,7 +52,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function Projects() {
   const { subjects, lists, lessons, terms } = useLoaderData<typeof loader>();
-  const now = new Date().toLocaleDateString();
+  const now = dayjs().format("YYYY-MM-DD");
   const today = new Date(now).toISOString().split("T")[0];
   const classifiedLessons = lessons.reduce(
     (acc: any, lesson) => {

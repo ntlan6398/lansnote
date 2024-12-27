@@ -25,8 +25,7 @@ export default function LessonBoard({ lessonCards }: { lessonCards: any[] }) {
             {card.count}
           </div>
           <div className="space-y-2 text-left">
-            {card.lessons.map((lesson) => {
-              console.log(lesson);
+            {card.lessons.map((lesson: any) => {
               return (
                 <Link
                   key={lesson.id}

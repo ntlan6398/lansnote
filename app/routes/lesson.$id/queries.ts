@@ -25,13 +25,14 @@ export async function createNewLesson(accountId: string) {
   if (!subjectId) {
     throw new Error("Default subject not found");
   }
+  const now = dayjs().format("YYYY-MM-DD");
   return prisma.lesson.create({
     data: {
       title: "Untitled",
       content: "",
       comments: "",
-      startDate: new Date(),
-      reviewDate: new Date(),
+      startDate: new Date(now),
+      reviewDate: new Date(now),
       onTrack: 0,
       subjects: {
         connect: {
