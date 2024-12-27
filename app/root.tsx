@@ -212,7 +212,7 @@ export default function App() {
               LansNote
             </div>
             <div className="space-y-2 font-medium">
-              <div className="flex items-center justify-between rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+              <div className="flex items-center justify-between rounded-lg hover:bg-gray-100 hover:text-[#112D4E]">
                 <Link
                   className="flex items-center p-2 gap-2  rounded-lg hover:bg-gray-100 hover:text-[#112D4E]"
                   to="/home"
@@ -225,7 +225,7 @@ export default function App() {
                 </Link>
               </div>
 
-              <button className="flex w-full items-center justify-between  rounded-lg hover:bg-gray-100 ">
+              <button className="flex w-full items-center justify-between  rounded-lg hover:bg-gray-100 hover:text-[#112D4E]">
                 <div className="flex items-center p-2 gap-2  rounded-lg hover:bg-gray-100 hover:text-[#112D4E]">
                   <FiList />
                   <span className="ml-3">List</span>
