@@ -128,7 +128,6 @@ export default function App() {
   }
   const now = dayjs().format("YYYY-MM-DD");
   const [today, setToday] = useState(now);
-
   return (
     <html lang="en">
       <head>
@@ -140,10 +139,15 @@ export default function App() {
       </head>
       <body>
         <div className="bg-[#112D4E] border-b border-slate-800 flex items-center justify-between py-2 sm:py-4 px-4 sm:px-8 box-border">
-          <Link to="/home" className="block leading-3 w-1/3">
+          <Link to="/home" className="block leading-3 w-1/4 sm:w-1/3">
             <div
-              className="font-black text-2xl sm:text-3xl text-[#F9F7F7] w-fit"
+              className="font-black text-xl sm:text-2xl md:text-3xl text-[#F9F7F7] w-fit"
               onMouseEnter={() => {
+                if (userId) {
+                  setMenuOpen(!menuOpen);
+                }
+              }}
+              onClick={() => {
                 if (userId) {
                   setMenuOpen(!menuOpen);
                 }
@@ -152,7 +156,7 @@ export default function App() {
               LansNote
             </div>
           </Link>
-          <div className="w-2/3 sm:w-1/3 flex justify-end">
+          <div className="w-full sm:w-2/3 md:w-1/3 flex justify-end">
             {userId ? (
               <div className="flex items-center space-x-2 sm:space-x-6 rtl:space-x-reverse">
                 <Link
@@ -195,13 +199,26 @@ export default function App() {
               setMenuOpen(false);
             }}
             id="sidebar"
-            className="fixed text-2xl overflow-y-auto w-4/5 sm:w-1/5 h-screen bg-[#112D4E] z-[100] text-[#F9F7F7]"
+            className="fixed top-0 left-0 text-2xl overflow-y-auto w-full sm:w-1/5 h-full bg-[#112D4E] z-[100] text-[#F9F7F7]"
           >
+            <div
+              className=" bg-[#112D4E] border-b border-slate-800 flex items-center justify-between py-2 sm:py-4 px-4 sm:px-8 box-border font-black text-xl sm:text-2xl md:text-3xl text-[#F9F7F7] w-fit"
+              onClick={() => {
+                if (userId) {
+                  setMenuOpen(!menuOpen);
+                }
+              }}
+            >
+              LansNote
+            </div>
             <div className="space-y-2 font-medium">
               <div className="flex items-center justify-between rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                 <Link
                   className="flex items-center p-2 gap-2  rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                   to="/home"
+                  onClick={() => {
+                    setMenuOpen(false);
+                  }}
                 >
                   <FiHome />
                   <span className="ml-3">Home</span>
@@ -244,6 +261,9 @@ export default function App() {
                     <Link
                       className="flex items-center p-2 gap-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                       to={`/list/${term.id}?page=1`}
+                      onClick={() => {
+                        setMenuOpen(false);
+                      }}
                     >
                       <FiCornerDownRight />
                       <span className="ml-3">{term.name}</span>
@@ -288,6 +308,9 @@ export default function App() {
                     <Link
                       className="flex items-center p-2 gap-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                       to={`/subject/${subject.id}`}
+                      onClick={() => {
+                        setMenuOpen(false);
+                      }}
                     >
                       <FiCornerDownRight />
                       <span className="ml-3">{subject.name}</span>
