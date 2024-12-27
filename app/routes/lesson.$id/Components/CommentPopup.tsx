@@ -65,7 +65,7 @@ export default function CommentPopup({
       return newTermsGrade;
     });
     setShowDefinitions(false);
-    highLightRange(rangeSelection, term.id, selectedText);
+    highLightRange(rangeSelection, term.id, selectedText, term.type);
   };
 
   return (

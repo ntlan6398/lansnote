@@ -441,7 +441,12 @@ export default function Lesson() {
       }, 1500);
     }
     if (fetcherData?.newTerm) {
-      highLightRange(rangeSelection, fetcherData.newTerm.id, selectedText);
+      highLightRange(
+        rangeSelection,
+        fetcherData.newTerm.id,
+        selectedText,
+        fetcherData.newTerm.type,
+      );
       setActiveComment(fetcherData.newTerm);
       setSaveSuccess(true);
       setComments((prev) => {

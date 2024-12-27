@@ -123,12 +123,11 @@ export function getSelection() {
   const sentence = getSentence(paragraph, startOffset);
   return { text, sentence };
 }
-export const highLightRange = (range, id, text) => {
+export const highLightRange = (range, id, text, partOfSpeech) => {
   const span = document.createElement("span");
-  span.className =
-    "bg-yellow-200 cursor-pointer transition-colors hover:bg-yellow-300";
   span.setAttribute("data-comment", "true");
   span.setAttribute("data-term-id", id);
+  span.setAttribute("data-part-of-speech", partOfSpeech);
   span.textContent = text;
   range.deleteContents();
   range.insertNode(span);

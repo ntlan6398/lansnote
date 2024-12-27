@@ -3,11 +3,64 @@
 @tailwind utilities;
 
 [data-comment="true"] {
-  background-color: rgba(255, 255, 0, 0.3);
+  background-color: rgba(255, 255, 0, 0.5);
   cursor: pointer;
   position: relative;
 }
-
 [data-comment="true"]:hover {
-  background-color: rgba(255, 255, 0, 0.5);
+  background-color: rgba(255, 255, 0, 0.7);
+}
+
+[data-comment="true"][data-part-of-speech="idiom"] {
+  background-color: rgb(251, 113, 113, 0.5);
+  cursor: pointer;
+  position: relative;
+}
+[data-comment="true"][data-part-of-speech="idiom"]:hover {
+  background-color: rgb(251, 113, 113, 0.7);
+}
+
+[data-comment="true"][data-part-of-speech="noun"] {
+  background-color: rgb(152, 255, 152, 0.5);
+  cursor: pointer;
+  position: relative;
+}
+[data-comment="true"][data-part-of-speech="noun"]:hover {
+  background-color: rgb(152, 255, 152, 0.7);
+}
+
+[data-comment="true"][data-part-of-speech="verb"] {
+  background-color: rgb(125, 211, 252, 0.5);
+  cursor: pointer;
+  position: relative;
+}
+[data-comment="true"][data-part-of-speech="verb"]:hover {
+  background-color: rgb(125, 211, 252, 0.7);
+}
+
+[data-comment="true"][data-part-of-speech="adjective"] {
+  background-color: rgb(249, 168, 212, 0.5);
+  cursor: pointer;
+  position: relative;
+}
+[data-comment="true"][data-part-of-speech="adjective"]:hover {
+  background-color: rgb(249, 168, 212, 0.5);
+}
+
+[data-comment="true"][data-part-of-speech="adverb"] {
+  background-color: rgb(216, 180, 254, 0.5);
+  cursor: pointer;
+  position: relative;
+}
+[data-comment="true"][data-part-of-speech="adverb"]:hover {
+  background-color: rgb(216, 180, 254, 0.7);
+}
+
+[data-comment="true"][data-part-of-speech="phrase"] {
+  background-color: rgb(252, 165, 165, 0.5);
+  cursor: pointer;
+  position: relative;
+}
+[data-comment="true"][data-part-of-speech="phrase"]:hover {
+  background-color: rgb(252, 165, 165, 0.5);
 }

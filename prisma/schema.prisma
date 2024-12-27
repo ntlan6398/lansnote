@@ -56,7 +56,7 @@ model Lesson {
 
 model Term {
   id         String    @id @default(uuid())
-  term       String
+  term       String    
   type       String
   definition String
   example    String
@@ -71,4 +71,5 @@ model Term {
   listId     Int
   Account    Account   @relation(fields: [accountId], references: [id])
   List       List      @relation(fields: [listId], references: [id])
+  @@index([term])
 }
