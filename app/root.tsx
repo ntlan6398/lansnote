@@ -118,7 +118,7 @@ export default function App() {
           className="w-full p-2 rounded-lg bg-[#DBE2EF]"
         />
         <button
-          className="bg-[#3F72AF] text-white p-2 rounded-lg"
+          className="bg-[#3F72AF] text-[] p-2 rounded-lg"
           onClick={(e) => handleAdd(e, action)}
         >
           Add
@@ -139,10 +139,10 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <div className="bg-slate-900 border-b border-slate-800 flex items-center justify-between py-2 sm:py-4 px-4 sm:px-8 box-border">
+        <div className="bg-[#112D4E] border-b border-slate-800 flex items-center justify-between py-2 sm:py-4 px-4 sm:px-8 box-border">
           <Link to="/home" className="block leading-3 w-1/3">
             <div
-              className="font-black text-2xl sm:text-3xl text-white w-fit"
+              className="font-black text-2xl sm:text-3xl text-[#F9F7F7] w-fit"
               onMouseEnter={() => {
                 if (userId) {
                   setMenuOpen(!menuOpen);
@@ -157,12 +157,11 @@ export default function App() {
               <div className="flex items-center space-x-2 sm:space-x-6 rtl:space-x-reverse">
                 <Link
                   to={`/lesson/new?today=${today}`}
-                  className={`flex gap-1 sm:gap-2 text-white bg-[#3F72AF] hover:bg-[#DBE2EF] hover:text-[#112D4E] font-medium rounded-lg text-xs sm:text-sm p-2 sm:p-2.5 text-center inline-flex items-center ${
+                  className={`flex gap-1 sm:gap-2 text-[#F9F7F7] bg-[#3F72AF] hover:bg-[#DBE2EF] hover:text-[#112D4E] font-medium rounded-lg text-xs sm:text-sm p-2 sm:p-2.5 text-center inline-flex items-center ${
                     isNavigating ? "pointer-events-none opacity-50" : ""
                   }`}
                   onClick={() => {
                     const now = dayjs().format("YYYY-MM-DD");
-                    console.log("now", now);
                     setToday(now);
                   }}
                 >
@@ -173,7 +172,7 @@ export default function App() {
                 <form method="post" action="/logout">
                   <button className="block text-center group relative">
                     <LogoutIcon />
-                    <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                    <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-gray-800 text-[] text-xs rounded py-1 px-2 whitespace-nowrap">
                       Logout
                     </span>
                   </button>
@@ -196,7 +195,7 @@ export default function App() {
               setMenuOpen(false);
             }}
             id="sidebar"
-            className="fixed text-2xl overflow-y-auto w-4/5 sm:w-1/5 h-screen bg-[#F9F7F7] dark:bg-[#112D4E] z-[100] text-[#112D4E] dark:text-white"
+            className="fixed text-2xl overflow-y-auto w-4/5 sm:w-1/5 h-screen bg-[#112D4E] z-[100] text-[#F9F7F7]"
           >
             <div className="space-y-2 font-medium">
               <div className="flex items-center justify-between rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">

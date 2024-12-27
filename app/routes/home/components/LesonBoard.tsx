@@ -30,7 +30,7 @@ export default function LessonBoard({ lessonCards }: { lessonCards: any[] }) {
                 <Link
                   key={lesson.id}
                   to={`/lesson/${lesson.id}`}
-                  className="block p-2 bg-white rounded hover:bg-gray-50 relative group"
+                  className="block p-2 bg-[#F9F7F7] rounded hover:bg-gray-50 relative group"
                 >
                   <button
                     onClick={(e) => {

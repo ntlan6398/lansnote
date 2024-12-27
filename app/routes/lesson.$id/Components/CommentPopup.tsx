@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { highLightRange } from "../utils";
+import { FiSearch } from "react-icons/fi";
 
 export default function CommentPopup({
   popupRef,
@@ -16,6 +17,7 @@ export default function CommentPopup({
   rangeSelection,
   selectedText,
   setTermsGrade,
+  handleDictionarySearch,
 }: {
   popupRef: React.RefObject<HTMLDivElement>;
   optionsPosition: { top: number; left: number; bottom: number };
@@ -31,6 +33,7 @@ export default function CommentPopup({
   rangeSelection: any;
   selectedText: string;
   setTermsGrade: (termsGrade: any) => void;
+  handleDictionarySearch: () => void;
 }) {
   let styleTop = {
     top: `${optionsPosition?.top}px`,
@@ -120,6 +123,16 @@ export default function CommentPopup({
         </div>
 
         <div className="relative">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Definition
+            <button
+              onClick={handleDictionarySearch}
+              className="p-2 hover:bg-gray-100 rounded-full"
+              title="Search in Dictionary"
+            >
+              <FiSearch className="w-4 h-4" />
+            </button>
+          </label>
           <textarea
             name="definition"
             className="w-full p-2 border rounded-md text-sm"

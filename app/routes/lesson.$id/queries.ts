@@ -65,8 +65,8 @@ export function updateLesson(lesson: any) {
       title: lesson.title,
       content: lesson.content,
       comments: lesson.comments,
-      startDate: new Date(lesson.startDate),
-      reviewDate: new Date(lesson.reviewDate),
+      startDate: lesson.startDate,
+      reviewDate: lesson.reviewDate,
       onTrack: parseInt(lesson.onTrack),
       subjects: {
         connect: {

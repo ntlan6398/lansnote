@@ -113,7 +113,9 @@ export default function Projects() {
 
   return (
     <div className="h-full flex flex-col items-center justify-center">
-      <h1 className="text-2xl font-bold my-8 ">What is waiting for you?</h1>
+      <h1 className="text-2xl font-bold my-8 text-[#112D4E]">
+        What is waiting for you?
+      </h1>
       <div className="flex justify-center gap-8 w-full">
         <button
           className={`px-4 py-2 rounded-t-lg  font-bold ${

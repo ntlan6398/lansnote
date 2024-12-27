@@ -158,7 +158,7 @@ export default function Subject() {
 
       {/* New Term Modal */}
       {isNewTermModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black  bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Add New Term</h2>
@@ -251,7 +251,7 @@ export default function Subject() {
       {/* Responsive table */}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white rounded-lg overflow-hidden shadow-lg">
-          <thead className="bg-[#112D4E] text-white">
+          <thead className="bg-[#112D4E] text-[#F9F7F7]">
             <tr>
               <th className="px-4 md:px-6 py-3 text-center text-xs md:text-sm">
                 Actions

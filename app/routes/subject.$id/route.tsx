@@ -49,16 +49,16 @@ export default function Subject() {
     );
   };
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#F9F7F7]">
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {lessons?.map((lesson) => (
-            <div key={lesson.id} className="relative group bg-white">
+            <div key={lesson.id} className="relative group bg-[#F9F7F7]">
               <Link
                 to={`/lesson/${lesson.id}`}
-                className="group flex flex-col items-center p-4 bg-white hover:bg-gray-50 rounded-lg transition-colors"
+                className="group flex flex-col items-center p-4 bg-[#F9F7F7] hover:bg-gray-50 rounded-lg transition-colors"
               >
-                <div className="relative mb-2 bg-white z-[1]">
+                <div className="relative mb-2 bg-[#F9F7F7] z-[1]">
                   <FaRegFileLines className="w-12 h-12 text-navy-600 group-hover:text-navy-700" />
                 </div>
                 <span
@@ -90,7 +90,7 @@ export default function Subject() {
           {/* Add New Lesson Button */}
           <Link
             to="/lesson/new"
-            className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-colors bg-white relative z-[1]"
+            className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-colors bg-[#F9F7F7] relative z-[1]"
           >
             <div className="mb-2 z-[1]">
               <svg

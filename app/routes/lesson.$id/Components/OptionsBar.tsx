@@ -10,18 +10,19 @@ import { useEffect, useState } from "react";
 
 const TEXT_COLORS = [
   { name: "Black", value: "#000000" },
+  { name: "White", value: "#FFFFFF" },
   { name: "Red", value: "#FF0000" },
   { name: "Blue", value: "#0000FF" },
   { name: "Green", value: "#008000" },
   { name: "Purple", value: "#800080" },
   { name: "Orange", value: "#FFA500" },
-  { name: "Brown", value: "#A52A2A" },
   { name: "Navy", value: "#000080" },
   { name: "Teal", value: "#008080" },
   { name: "Maroon", value: "#800000" },
 ];
 
 const HIGHLIGHT_COLORS = [
+  { name: "No Color", value: "" },
   { name: "Yellow", value: "#FFFF00" },
   { name: "Lime", value: "#CCFF00" },
   { name: "Cyan", value: "#00FFFF" },
@@ -30,7 +31,7 @@ const HIGHLIGHT_COLORS = [
   { name: "Orange", value: "#FFE5B4" },
   { name: "Light Green", value: "#90EE90" },
   { name: "Light Blue", value: "#ADD8E6" },
-  { name: "Peach", value: "#FFDAB9" },
+
   { name: "Mint", value: "#98FF98" },
 ];
 
@@ -68,7 +69,11 @@ export default function OptionsBar({
     };
   }, [showTextColorPicker, showHighlightColorPicker, showTextFormatMenu]);
   const applyFormatting = (command: string, value: string | null = null) => {
-    document.execCommand(command, false, value ?? undefined);
+    if (command === "hiliteColor" && value === "") {
+      document.execCommand("backColor", false, "transparent");
+    } else {
+      document.execCommand(command, false, value ?? undefined);
+    }
     setShowOptionsBar(false);
   };
 
@@ -195,8 +200,14 @@ export default function OptionsBar({
                     applyFormatting("hiliteColor", color.value);
                     setShowHighlightColorPicker(false);
                   }}
-                  className="w-4 h-4 rounded-full border border-gray-200 hover:scale-110 transition-transform"
-                  style={{ backgroundColor: color.value }}
+                  className={`w-4 h-4 rounded-full border border-gray-200 hover:scale-110 transition-transform ${
+                    color.value === ""
+                      ? "bg-white relative before:content-['✕'] before:absolute before:text-red-500 before:text-[10px] before:font-bold before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2"
+                      : ""
+                  }`}
+                  style={
+                    color.value ? { backgroundColor: color.value } : undefined
+                  }
                   title={color.name}
                 />
               ))}

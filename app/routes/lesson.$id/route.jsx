@@ -18,6 +18,7 @@ import {
   updatePracticeTerms,
 } from "./queries";
 import { getSelection, highLightRange } from "./utils";
+import dayjs from "dayjs";
 export const meta = () => {
   return [{ title: "Lesson" }];
 };
@@ -48,7 +49,6 @@ export async function action({ request, params }) {
     case "update-lesson":
       const lessonData = Object.fromEntries(formData);
       const lesson = await updateLesson(lessonData);
-      console.log("updated");
       return { lesson };
 
     case "lookup-term":
@@ -223,6 +223,7 @@ export default function Lesson() {
   };
   const handleDictionarySearch = async () => {
     setShowDictionaryPopup(true);
+    setShowCommentPopup(false);
     setShowOptionsBar(false);
     const { leftPosition, topPosition, bottomPosition } =
       calculatePopupSize(rangeSelection);
@@ -292,11 +293,7 @@ export default function Lesson() {
     setLesson({
       ...lesson,
       onTrack: newOnTrack,
-      reviewDate: new Date(
-        new Date().setDate(
-          new Date().getDate() + REVIEW_INTERVAL[newOnTrack - 1],
-        ),
-      ).toISOString(),
+      reviewDate: dayjs().add(REVIEW_INTERVAL[index], "day").format(),
     });
     let grades = termsGrade;
     if (newOnTrack === 1) {
@@ -510,7 +507,7 @@ export default function Lesson() {
               className="bg-blue-50"
               type="date"
               id="startDate"
-              value={new Date(lesson.startDate).toISOString().split("T")[0]}
+              value={dayjs(lesson.startDate).format("YYYY-MM-DD")}
               onChange={(e) => {
                 if (lesson.onTrack === 0) {
                   setLesson({
@@ -545,7 +542,7 @@ export default function Lesson() {
               className="bg-blue-50 flex-1"
               type="date"
               id="reviewDate"
-              value={new Date(lesson.reviewDate).toISOString().split("T")[0]}
+              value={dayjs(lesson.reviewDate).format("YYYY-MM-DD")}
             />
           </div>
           <div className="w-full grid grid-cols-2 md:grid-cols-7 gap-1 md:gap-2 place-items-center">
@@ -621,6 +618,7 @@ export default function Lesson() {
           rangeSelection={rangeSelection}
           selectedText={selectedText}
           setTermsGrade={setTermsGrade}
+          handleDictionarySearch={handleDictionarySearch}
         />
       )}
       {saveStatus && (
@@ -642,7 +640,7 @@ export default function Lesson() {
       )}
       {confirmReview && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white p-4 md:p-6 rounded-lg shadow-lg w-full max-w-sm">
+          <div className="bg-[#F9F7F7] p-4 md:p-6 rounded-lg shadow-lg w-full max-w-sm">
             <h3 className="text-lg font-semibold mb-4">Confirm Review</h3>
             <p className="mb-6">Have you reviewed the lesson carefully?</p>
             <div className="flex justify-end gap-4">
