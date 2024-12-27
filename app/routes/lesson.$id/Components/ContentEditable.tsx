@@ -26,7 +26,7 @@ export default function ContentEditable({ content = "" }: { content: string }) {
   }, []);
   const [show, setShow] = useState(false);
   const [showMore, setShowMore] = useState(false);
-  let timeout: NodeJS.Timeout;
+
   const handleAddRow = (position: string) => {
     const container = document.createElement("div");
     const currentElement = ref.current?.parentElement;
@@ -66,20 +66,43 @@ export default function ContentEditable({ content = "" }: { content: string }) {
     setSeparated(true);
   };
   const handleResizeColumns = (position: string) => {
-    let newCol;
-    if (position === "left") {
-      newCol = col + 1;
-    } else {
-      newCol = col - 1;
-    }
     const EditContainer = ref.current?.querySelector(".edit-container");
     const editors = EditContainer?.querySelectorAll("div");
+    const currentCol = editors?.[0].style.gridColumnEnd || "6";
+    let newCol;
+    if (position === "left") {
+      newCol = parseInt(currentCol) + 1;
+    } else {
+      newCol = parseInt(currentCol) - 1;
+    }
+
     if (editors) {
       editors[0].style.gridColumnEnd = newCol.toString();
       editors[1].style.gridColumnStart = newCol.toString();
     }
     setCol(newCol);
   };
+  useEffect(() => {
+    function handleClickOutside(event) {
+      // Handle dictionary popup
+      if (
+        (show || showMore) &&
+        ref.current &&
+        !ref.current.contains(event.target)
+      ) {
+        setShow(false);
+        setShowMore(false);
+      }
+    }
+
+    // Only add listener if either popup is shown
+    if (show || showMore) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [show, showMore]);
 
   return (
     <div
@@ -87,34 +110,20 @@ export default function ContentEditable({ content = "" }: { content: string }) {
         if (
           (e.key === "Backspace" || e.key === "Delete") &&
           ref.current?.innerText === "" &&
-          ref.current?.parentElement?.parentElement?.children?.length > 1
+          ref?.current?.parentElement?.parentElement?.children?.length > 1
         ) {
           ref.current?.parentElement?.remove();
         }
       }}
       onFocus={() => {
-        clearTimeout(timeout);
         setShowMore(true);
-      }}
-      onBlur={() => {
-        timeout = setTimeout(() => {
-          setShowMore(false);
-          setShow(false);
-        }, 5000);
       }}
       className={` flex flex-col items-center `}
       ref={ref}
     >
       <div
         onMouseEnter={() => {
-          clearTimeout(timeout);
           setShowMore(true);
-        }}
-        onMouseLeave={() => {
-          timeout = setTimeout(() => {
-            setShow(false);
-            setShowMore(false);
-          }, 5000);
         }}
         className="flex items-center gap-2 cursor-pointer text-gray-500 text-xl"
       >
