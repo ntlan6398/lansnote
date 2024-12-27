@@ -23,7 +23,6 @@ export const meta = () => {
   return [{ title: "Lesson" }];
 };
 const REVIEW_INTERVAL = [1, 3, 5, 10, 20, 40, 50];
-
 export async function loader({ request, params }) {
   const lessonId = params.id;
   let userId = await getAuthFromRequest(request);
@@ -308,6 +307,7 @@ export default function Lesson() {
     formData.append("grades", JSON.stringify(grades));
     fetcher.submit(formData, { method: "post" });
   };
+  const [firstRender, setFirstRender] = useState(false);
   useEffect(() => {
     const lessonContainer = document.getElementById("lesson-container");
     sessionStorage.setItem("lessonContent", lessonContainer.innerHTML);
@@ -330,7 +330,6 @@ export default function Lesson() {
     }
     contentContainer.remove();
     lessonContainer.appendChild(clonedContent);
-
     // Create a mutation observer
     const observer = new MutationObserver((mutations) => {
       const content = sessionStorage.getItem("lessonContent");
@@ -339,7 +338,6 @@ export default function Lesson() {
         sessionStorage.setItem("lessonContent", lessonContainer.innerHTML);
       }
     });
-
     // Configure and start observing
     observer.observe(lessonContainer, {
       childList: true, // observe direct children
@@ -349,11 +347,40 @@ export default function Lesson() {
     });
 
     lessonContainer.addEventListener("click", handleTextSelection);
+    setFirstRender(true);
     return () => {
       observer.disconnect();
+
       lessonContainer.removeEventListener("click", handleTextSelection);
     };
   }, []);
+  useEffect(() => {
+    let timeout;
+    if (firstRender) {
+      timeout = setTimeout(() => {
+        if (window.innerWidth < 640) {
+          const editableElements = document.querySelectorAll(
+            "[contentEditable=true]",
+          );
+          if (editableElements.length > 0) {
+            editableElements.forEach((element) => {
+              element.setAttribute("contentEditable", "false");
+            });
+          }
+        } else {
+          const editableElements = document.querySelectorAll(
+            "[contentEditable=false]",
+          );
+          if (editableElements.length > 0) {
+            editableElements.forEach((element) => {
+              element.setAttribute("contentEditable", "true");
+            });
+          }
+        }
+      }, 1000);
+    }
+    return () => clearTimeout(timeout);
+  }, [firstRender]);
   useEffect(() => {
     const lessonContainer = document.getElementById("lesson-container");
     lessonContainer.addEventListener("click", handleTermClick);

@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 function practice(term: any, grade: SuperMemoGrade) {
   const { interval, repetition, efactor } = supermemo(term, grade);
   const lastReview = dayjs(Date.now()).toISOString();
-  const nextReview = dayjs(Date.now()).add(interval, "day").toISOString();
+  const nextReview = dayjs(Date.now()).add(interval, "hour").toISOString();
   return { ...term, interval, repetition, efactor, lastReview, nextReview };
 }
 export const defaultSubjectId = async (accountId: string) => {
@@ -135,13 +135,13 @@ export async function updateTerm(term: any) {
   });
 }
 export async function updatePracticeTerms(terms: any, grades: any) {
-  Object.keys(terms).forEach((key) => {
+  Object.keys(terms).forEach(async (key) => {
     const term = terms[key];
     const grade = grades[key];
-    const updatedTerm = practice(term, grade);
-    return prisma.term.update({
+    const practicedTerm = practice(term, grade);
+    const updatedTerm = await prisma.term.update({
       where: { id: term.id },
-      data: updatedTerm,
+      data: practicedTerm,
     });
   });
 }
