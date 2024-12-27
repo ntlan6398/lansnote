@@ -42,19 +42,22 @@ export default function ContentEditable({ content = "" }: { content: string }) {
   };
 
   const handleSplitColumns = (position: string) => {
-    const EditContainer = ref.current?.querySelector(".edit-container");
-    const container = document.createElement("div");
-    container.setAttribute("contentEditable", "true");
-    container.className =
-      "focus:outline-none focus:ring focus:border-blue-500 rounded w-full max-w-full block break-words break-keep h-auto overflow-hidden px-10";
-    // Insert new column before or after
-    if (position === "left") {
-      EditContainer?.insertAdjacentElement("afterbegin", container);
-    } else {
-      EditContainer?.insertAdjacentElement("beforeend", container);
-    }
-    const editors = EditContainer?.querySelectorAll("div");
-    if (editors) {
+    const EditContainer = ref.current?.querySelector(
+      ".edit-container",
+    ) as HTMLElement;
+    let editors = EditContainer?.querySelectorAll("div");
+    if (!editors || editors.length === 1) {
+      const container = document.createElement("div");
+      container.setAttribute("contentEditable", "true");
+      container.className =
+        "focus:outline-none focus:ring focus:border-blue-500 rounded w-full max-w-full block break-words break-keep h-auto overflow-hidden px-10";
+      // Insert new column before or after
+      if (position === "left") {
+        EditContainer?.insertAdjacentElement("afterbegin", container);
+      } else {
+        EditContainer?.insertAdjacentElement("beforeend", container);
+      }
+      editors = EditContainer.querySelectorAll("div");
       editors[0].style.gridColumnStart = "1";
       editors[0].style.gridColumnEnd = "7";
       editors[1].style.gridColumnStart = "7";

@@ -29,6 +29,7 @@ import { getAuthFromRequest } from "./auth/auth";
 import { getNavData, addSubject, addList } from "./routes/home/queries";
 import "./styles.css";
 import { useState } from "react";
+import dayjs from "dayjs";
 
 export function shouldRevalidate({ formAction }: ShouldRevalidateFunctionArgs) {
   return formAction && ["/login", "/signup", "logout"].includes(formAction);
@@ -125,6 +126,8 @@ export default function App() {
       </div>
     );
   }
+  const now = dayjs().format("YYYY-MM-DD");
+  const [today, setToday] = useState(now);
 
   return (
     <html lang="en">
@@ -153,10 +156,15 @@ export default function App() {
             {userId ? (
               <div className="flex items-center space-x-2 sm:space-x-6 rtl:space-x-reverse">
                 <Link
-                  to="/lesson/new"
+                  to={`/lesson/new?today=${today}`}
                   className={`flex gap-1 sm:gap-2 text-white bg-[#3F72AF] hover:bg-[#DBE2EF] hover:text-[#112D4E] font-medium rounded-lg text-xs sm:text-sm p-2 sm:p-2.5 text-center inline-flex items-center ${
                     isNavigating ? "pointer-events-none opacity-50" : ""
                   }`}
+                  onClick={() => {
+                    const now = dayjs().format("YYYY-MM-DD");
+                    console.log("now", now);
+                    setToday(now);
+                  }}
                 >
                   <FiPlus className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">New Lesson</span>

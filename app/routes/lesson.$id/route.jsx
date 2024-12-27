@@ -27,7 +27,8 @@ export async function loader({ request, params }) {
   const lessonId = params.id;
   let userId = await getAuthFromRequest(request);
   if (lessonId === "new") {
-    const lesson = await createNewLesson(userId);
+    const today = new URL(request.url).searchParams.get("today");
+    const lesson = await createNewLesson(userId, today);
     if (!lesson) {
       throw redirect("/home");
     }

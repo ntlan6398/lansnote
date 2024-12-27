@@ -15,7 +15,7 @@ export const defaultSubjectId = async (accountId: string) => {
   });
   return defaultSubject?.id;
 };
-export async function createNewLesson(accountId: string) {
+export async function createNewLesson(accountId: string, today: string) {
   const defaultSubject = await prisma.subject.findFirst({
     where: {
       accountId: accountId,
@@ -25,14 +25,13 @@ export async function createNewLesson(accountId: string) {
   if (!subjectId) {
     throw new Error("Default subject not found");
   }
-  const now = dayjs().format("YYYY-MM-DD");
   return prisma.lesson.create({
     data: {
       title: "Untitled",
       content: "",
       comments: "",
-      startDate: new Date(now),
-      reviewDate: new Date(now),
+      startDate: new Date(today),
+      reviewDate: new Date(today),
       onTrack: 0,
       subjects: {
         connect: {
