@@ -47,6 +47,7 @@ export async function action({ request, params }) {
   switch (intent) {
     case "update-lesson":
       const lessonData = Object.fromEntries(formData);
+      console.log(lessonData);
       const lesson = await updateLesson(lessonData);
       return { lesson };
 
@@ -292,7 +293,9 @@ export default function Lesson() {
     setLesson({
       ...lesson,
       onTrack: newOnTrack,
-      reviewDate: dayjs().add(REVIEW_INTERVAL[index], "day").format(),
+      reviewDate:
+        dayjs().add(REVIEW_INTERVAL[index], "day").format("YYYY-MM-DD") +
+        "T00:00:00.000Z",
     });
     let grades = termsGrade;
     if (newOnTrack === 1) {
