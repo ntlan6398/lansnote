@@ -59,7 +59,6 @@ export async function getLesson(lessonId: string) {
   return { lesson, comments };
 }
 export function updateLesson(lesson: any) {
-  console.log(lesson);
   return prisma.lesson.update({
     where: { id: lesson.id },
     data: {

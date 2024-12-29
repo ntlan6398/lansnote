@@ -32,7 +32,11 @@ export async function loader({ request, params }) {
     if (!lesson) {
       throw redirect("/home");
     }
-    return redirect(`/lesson/${lesson.id}`);
+    return redirect(`/lesson/${lesson.id}`, {
+      headers: {
+        "X-Remix-Reload-Document": "true",
+      },
+    });
   }
   const { lesson, comments } = await getLesson(lessonId);
   if (!lesson) {
@@ -47,7 +51,6 @@ export async function action({ request, params }) {
   switch (intent) {
     case "update-lesson":
       const lessonData = Object.fromEntries(formData);
-      console.log(lessonData);
       const lesson = await updateLesson(lessonData);
       return { lesson };
 
