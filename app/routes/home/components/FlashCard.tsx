@@ -3,7 +3,10 @@ import Flip from "react-card-flip";
 import { IoReloadSharp } from "react-icons/io5";
 
 const FlashCard = ({ term }: { term: any | undefined }) => {
-  const [isFlipped, setIsFlipped] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(term.repetition % 2 !== 0);
+  if (term.audio && !isFlipped) {
+    new Audio(term.audio).play();
+  }
   return (
     <div className="w-full h-[24rem] md:h-[32rem] rounded-lg">
       {term !== undefined ? (
@@ -18,6 +21,11 @@ const FlashCard = ({ term }: { term: any | undefined }) => {
             onClick={() => setIsFlipped(!isFlipped)}
           >
             <div className="text-2xl md:text-4xl font-bold">{term.term}</div>
+            {term.phonetic && (
+              <div className="text-lg md:text-xl">
+                Phonetic: {term.phonetic}
+              </div>
+            )}
             <div className="text-lg md:text-xl">Example: {term.example}</div>
           </div>
           <div

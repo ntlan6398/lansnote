@@ -76,12 +76,15 @@ export async function action({ request, params }: ActionFunctionArgs) {
       const definition = formData.get("definition") as string;
       const example = formData.get("example") as string;
       const listId = formData.get("listId") as string;
+      const audio = formData.get("audio") as string | null;
+      const phonetic = formData.get("phonetic") as string | null;
       await createTerm({
         term: termData,
         type,
         definition,
         example,
-        status: "active",
+        audio,
+        phonetic,
         listId,
         accountId: userId,
       });
@@ -179,6 +182,28 @@ export default function Subject() {
                   <input
                     name="term"
                     type="text"
+                    required
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Phonetic
+                  </label>
+                  <input
+                    name="phonetic"
+                    type="text"
+                    required
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Audio
+                  </label>
+                  <input
+                    name="audio"
+                    type="file"
                     required
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   />

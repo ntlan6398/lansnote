@@ -115,7 +115,8 @@ export default function Lesson() {
     type: "",
     definition: "",
     example: "",
-    status: "active",
+    audio: null,
+    phonetic: null,
     createdAt: "",
     lastReview: null,
     nextReview: null,
@@ -151,10 +152,9 @@ export default function Lesson() {
       left: Math.max(10, leftPosition), // Ensure at least 10px from left edge
       bottom: bottomPosition ? Math.max(10, bottomPosition) : 0,
     });
-    const dictionaryData = await lookupWord(selectedText);
     setActiveComment({
       ...activeComment,
-      term: dictionaryData?.word || selectedText,
+      term: selectedText,
       type: "",
       definition: "",
       example: selectedSentence,
@@ -211,7 +211,13 @@ export default function Lesson() {
       setIsSavingTerm(false);
     }
   };
-  const handleAddCommentFromDefinition = (term, definition, partOfSpeech) => {
+  const handleAddCommentFromDefinition = (
+    term,
+    definition,
+    partOfSpeech,
+    audio,
+    phonetic,
+  ) => {
     setShowDictionaryPopup(false);
     setShowCommentPopup(true);
     setActiveComment({
@@ -221,6 +227,8 @@ export default function Lesson() {
       definition: definition.definition,
       type: partOfSpeech,
       example: selectedSentence,
+      audio: audio,
+      phonetic: phonetic,
       id: "None",
     });
   };
@@ -287,6 +295,9 @@ export default function Lesson() {
           return newTermsGrade;
         });
         setShowCommentPopup(true);
+        if (comment.audio) {
+          new Audio(comment.audio).play();
+        }
       }
     }
   };

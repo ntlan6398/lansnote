@@ -74,7 +74,7 @@ export default function CommentPopup({
       className="fixed z-50 bg-white shadow-xl rounded-md p-4"
       style={optionsPosition?.bottom ? styleBottom : styleTop}
     >
-      <form className="space-y-3" onSubmit={handleCommentSubmit}>
+      <form className="space-y-1" onSubmit={handleCommentSubmit}>
         <div>
           <div className="flex justify-between items-center mb-1">
             <label className="text-sm font-medium text-gray-700">Term</label>
@@ -123,11 +123,11 @@ export default function CommentPopup({
         </div>
 
         <div className="relative">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 flex items-center gap-1 mb-1">
             Definition
             <button
               onClick={handleDictionarySearch}
-              className="p-2 hover:bg-gray-100 rounded-full"
+              className="p-1 hover:bg-gray-100 rounded-full"
               title="Search in Dictionary"
             >
               <FiSearch className="w-4 h-4" />
@@ -195,13 +195,13 @@ export default function CommentPopup({
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="flex justify-between items-center">
+          <label className="block  text-sm font-medium text-gray-700 mb-1">
             Add to List
           </label>
           <select
             name="list"
-            className="w-full p-2 border rounded-md text-sm"
+            className=" p-1 border rounded-md text-sm"
             required
             value={activeComment.listId}
             onChange={(e) =>
@@ -214,6 +214,36 @@ export default function CommentPopup({
               </option>
             ))}
           </select>
+        </div>
+        <div className="flex justify-between items-center">
+          <label className="block  text-sm font-medium text-gray-700 mb-1">
+            Audio
+          </label>
+          <input
+            name="audio"
+            type="text"
+            placeholder="Add audio url..."
+            className=" p-1 rounded-md text-sm bg-gray-50"
+            value={activeComment.audio}
+            onChange={(e) =>
+              setActiveComment({ ...activeComment, audio: e.target.value })
+            }
+          />
+        </div>
+        <div className="flex justify-between items-center">
+          <label className="block  text-sm font-medium text-gray-700 mb-1">
+            Phonetic
+          </label>
+          <input
+            name="phonetic"
+            type="text"
+            placeholder="Add phonetic..."
+            className=" p-1 bg-gray-50 rounded-md text-sm"
+            value={activeComment.phonetic}
+            onChange={(e) =>
+              setActiveComment({ ...activeComment, phonetic: e.target.value })
+            }
+          />
         </div>
 
         <div className="flex justify-end gap-2 pt-2">

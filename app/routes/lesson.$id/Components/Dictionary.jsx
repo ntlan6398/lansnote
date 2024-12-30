@@ -21,7 +21,7 @@ export async function lookupWord(word) {
       `https://api.dictionaryapi.dev/api/v2/entries/en/${baseForm}`,
     );
     const data = await response.json();
-    return data[0];
+    return data;
   } catch (error) {
     console.error("Failed to fetch dictionary data:", error);
     return null;
@@ -104,77 +104,83 @@ export default function Dictionary({
 
       <div className="text-sm">
         {dictionaryData ? (
-          <div>
-            <div className="mb-3">
-              <div className="flex items-center gap-2">
-                <h3 className="font-bold text-lg">{dictionaryData.word}</h3>
-                {dictionaryData.phonetics?.some((p) => p.audio) && (
-                  <button
-                    onClick={() => {
-                      const audio = dictionaryData.phonetics.find(
-                        (p) => p.audio,
-                      )?.audio;
-                      if (audio) {
-                        new Audio(audio).play();
-                      }
-                    }}
-                    className="p-1 hover:bg-gray-100 rounded-full"
-                  >
-                    🔊
-                  </button>
-                )}
-              </div>
-              {dictionaryData.phonetic && (
-                <span className="text-gray-500">{dictionaryData.phonetic}</span>
-              )}
-            </div>
-
-            {dictionaryData.meanings.map((meaning, index) => (
-              <div key={index} className="mb-4">
-                <div className="font-semibold text-blue-600 mb-2">
-                  {meaning.partOfSpeech}
-                  {meaning.synonyms?.length > 0 && (
-                    <div className="text-sm font-normal text-gray-600 mt-1">
-                      Synonyms: {meaning.synonyms.slice(0, 5).join(", ")}
-                    </div>
+          dictionaryData.map((item) => {
+            const pronunciation = item.phonetics?.find((p) => p.audio);
+            const audio = pronunciation?.audio;
+            const phonetic = pronunciation?.text || item.phonetic;
+            return (
+              <div key={item.word}>
+                <div className="mb-3">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-lg">{item.word}</h3>
+                    {audio && (
+                      <button
+                        onClick={() => {
+                          if (audio) {
+                            new Audio(audio).play();
+                          }
+                        }}
+                        className="p-1 hover:bg-gray-100 rounded-full"
+                      >
+                        🔊
+                      </button>
+                    )}
+                  </div>
+                  {phonetic && (
+                    <span className="text-gray-500">{phonetic}</span>
                   )}
                 </div>
-                {meaning.definitions.map((def, idx) => (
-                  <div key={idx} className="mb-3 p-2 bg-gray-50 rounded-md">
-                    <div className="mb-1">
-                      <span className="font-medium text-gray-700">
-                        {idx + 1}.{" "}
-                      </span>
-                      {def.definition}
+
+                {item.meanings.map((meaning, index) => (
+                  <div key={index} className="mb-4">
+                    <div className="font-semibold text-blue-600 mb-2">
+                      {meaning.partOfSpeech}
+                      {meaning.synonyms?.length > 0 && (
+                        <div className="text-sm font-normal text-gray-600 mt-1">
+                          Synonyms: {meaning.synonyms.slice(0, 5).join(", ")}
+                        </div>
+                      )}
                     </div>
-                    {def.example && (
-                      <div className="text-gray-600 italic pl-4 text-sm border-l-2 border-gray-200 mt-1">
-                        "{def.example}"
+                    {meaning.definitions.map((def, idx) => (
+                      <div key={idx} className="mb-3 p-2 bg-gray-50 rounded-md">
+                        <div className="mb-1">
+                          <span className="font-medium text-gray-700">
+                            {idx + 1}.{" "}
+                          </span>
+                          {def.definition}
+                        </div>
+                        {def.example && (
+                          <div className="text-gray-600 italic pl-4 text-sm border-l-2 border-gray-200 mt-1">
+                            "{def.example}"
+                          </div>
+                        )}
+                        {def.synonyms?.length > 0 && (
+                          <div className="text-sm text-gray-500 mt-1">
+                            Similar: {def.synonyms.slice(0, 3).join(", ")}
+                          </div>
+                        )}
+                        <button
+                          onClick={() =>
+                            handleAddCommentFromDefinition(
+                              item.word,
+                              def,
+                              meaning.partOfSpeech,
+                              audio,
+                              phonetic,
+                            )
+                          }
+                          className="mt-2 text-sm text-blue-500 hover:text-blue-600 flex items-center gap-1"
+                        >
+                          <FiMessageSquare className="w-3 h-3" />
+                          Add Comment
+                        </button>
                       </div>
-                    )}
-                    {def.synonyms?.length > 0 && (
-                      <div className="text-sm text-gray-500 mt-1">
-                        Similar: {def.synonyms.slice(0, 3).join(", ")}
-                      </div>
-                    )}
-                    <button
-                      onClick={() =>
-                        handleAddCommentFromDefinition(
-                          dictionaryData.word,
-                          def,
-                          meaning.partOfSpeech,
-                        )
-                      }
-                      className="mt-2 text-sm text-blue-500 hover:text-blue-600 flex items-center gap-1"
-                    >
-                      <FiMessageSquare className="w-3 h-3" />
-                      Add Comment
-                    </button>
+                    ))}
                   </div>
                 ))}
               </div>
-            ))}
-          </div>
+            );
+          })
         ) : (
           <div className="text-center py-4">Loading...</div>
         )}

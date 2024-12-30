@@ -5,7 +5,6 @@ import {
   IoChevronBackCircle,
 } from "react-icons/io5";
 import { motion, AnimatePresence } from "framer-motion";
-import { ActionFunctionArgs } from "@remix-run/node";
 import { useFetcher } from "@remix-run/react";
 import { SuperMemoGrade } from "supermemo";
 
@@ -48,15 +47,20 @@ export default function TermDisplay({ terms }: { terms: any[] }) {
   const grades: SuperMemoGrade[] = [0, 1, 2, 3, 4, 5];
   const gradeIcons = ["😔", "🙁", "😑", "🙂", "😀", "😁"];
   const [currentGrade, setCurrentGrade] = useState(6);
+  const [mode, setMode] = useState("practice");
   const handleGradeClick = (grade: number) => {
     if (practicedTerms.length === 0) {
       return;
     }
     setCurrentGrade(grade);
+    if (practicedTerms[0].audio) {
+      new Audio(practicedTerms[0].audio).play();
+    }
+
     fetcher.submit(
       {
         intent: "practice-term",
-        term: JSON.stringify(terms[currentTerm]),
+        term: JSON.stringify(practicedTerms[0]),
         grade: grade,
       },
       { method: "post" },
@@ -71,7 +75,6 @@ export default function TermDisplay({ terms }: { terms: any[] }) {
       setPracticedTerms(practicedTerms);
     }, 1000);
   };
-  const [mode, setMode] = useState("practice");
 
   return (
     <div className="flex flex-col items-center justify-center p-4 md:p-16 gap-4 md:gap-8 text-[#112D4E]">

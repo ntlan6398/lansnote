@@ -96,7 +96,8 @@ export async function createTerm({
   type,
   definition,
   example,
-  status,
+  audio,
+  phonetic,
   listId,
   accountId,
 }: {
@@ -104,7 +105,8 @@ export async function createTerm({
   type: string;
   definition: string;
   example: string;
-  status: string;
+  audio: string | null;
+  phonetic: string | null;
   listId: string;
   accountId: string;
 }) {
@@ -114,7 +116,8 @@ export async function createTerm({
       type,
       definition,
       example,
-      status,
+      audio,
+      phonetic,
       Account: {
         connect: {
           id: accountId,

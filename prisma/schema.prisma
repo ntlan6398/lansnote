@@ -60,7 +60,8 @@ model Term {
   type       String
   definition String
   example    String
-  status     String    @default("new")
+  phonetic   String?
+  audio      String?
   createdAt  DateTime  @default(now())
   lastReview DateTime  @default(now())
   nextReview DateTime  @default(now())
