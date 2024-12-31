@@ -160,6 +160,8 @@ export default function Lesson() {
       example: selectedSentence,
       listId: lists[0].id,
       id: "None",
+      audio: null,
+      phonetic: null,
     });
 
     const formData = new FormData();
@@ -233,17 +235,6 @@ export default function Lesson() {
     });
   };
   const handleDictionarySearch = async () => {
-    setShowDictionaryPopup(true);
-    setShowCommentPopup(false);
-    setShowOptionsBar(false);
-    const { leftPosition, topPosition, bottomPosition } =
-      calculatePopupSize(rangeSelection);
-    setOptionsPosition({
-      top: Math.max(10, topPosition),
-      left: Math.max(10, leftPosition),
-      bottom: bottomPosition ? Math.max(10, bottomPosition) : 0,
-    });
-
     try {
       // Use the lookupWord function we created
       const data = await lookupWord(selectedText);
@@ -251,6 +242,16 @@ export default function Lesson() {
     } catch (error) {
       console.error("Failed to fetch dictionary data:", error);
     }
+    const { leftPosition, topPosition, bottomPosition } =
+      calculatePopupSize(rangeSelection);
+    setOptionsPosition({
+      top: Math.max(10, topPosition),
+      left: Math.max(10, leftPosition),
+      bottom: bottomPosition ? Math.max(10, bottomPosition) : 0,
+    });
+    setShowCommentPopup(false);
+    setShowOptionsBar(false);
+    setShowDictionaryPopup(true);
   };
   function calculatePopupSize(termElement) {
     const rect = termElement.getBoundingClientRect();
