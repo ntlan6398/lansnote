@@ -103,8 +103,8 @@ export default function Dictionary({
       </div>
 
       <div className="text-sm">
-        {dictionaryData ? (
-          dictionaryData.map((item) => {
+        {dictionaryData?.length > 0 ? (
+          dictionaryData?.map((item) => {
             const pronunciation = item.phonetics?.find((p) => p.audio);
             const audio = pronunciation?.audio;
             const phonetic = pronunciation?.text || item.phonetic;
