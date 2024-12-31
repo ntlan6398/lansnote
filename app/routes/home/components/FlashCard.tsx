@@ -23,9 +23,7 @@ const FlashCard = ({ term }: { term: any | undefined }) => {
           >
             <div className="text-2xl md:text-4xl font-bold">{term.term}</div>
             {term.phonetic && (
-              <div className="text-lg md:text-xl">
-                Phonetic: {term.phonetic}
-              </div>
+              <div className="text-lg md:text-xl">{term.phonetic}</div>
             )}
             <div className="text-lg md:text-xl">Example: {term.example}</div>
           </div>
