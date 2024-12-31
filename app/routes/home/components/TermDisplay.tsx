@@ -53,7 +53,10 @@ export default function TermDisplay({ terms }: { terms: any[] }) {
       return;
     }
     setCurrentGrade(grade);
-    if (practicedTerms[0].audio) {
+    const cardFront = document.querySelector(
+      ".react-card-front",
+    ) as HTMLElement;
+    if (practicedTerms[0].audio && cardFront?.style?.position === "absolute") {
       new Audio(practicedTerms[0].audio).play();
     }
 

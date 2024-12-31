@@ -1,11 +1,12 @@
 import { useState } from "react";
 import Flip from "react-card-flip";
-import { IoReloadSharp } from "react-icons/io5";
 
 const FlashCard = ({ term }: { term: any | undefined }) => {
-  const [isFlipped, setIsFlipped] = useState(term.repetition % 2 !== 0);
-  if (term.audio && !isFlipped) {
-    new Audio(term.audio).play();
+  const [isFlipped, setIsFlipped] = useState(
+    term?.repetition % 2 !== 0 || term?.repetition === undefined,
+  );
+  if (term?.audio && !isFlipped) {
+    new Audio(term?.audio).play();
   }
   return (
     <div className="w-full h-[24rem] md:h-[32rem] rounded-lg">
@@ -43,15 +44,8 @@ const FlashCard = ({ term }: { term: any | undefined }) => {
         <div className="w-full h-[24rem] md:h-[32rem] rounded-lg bg-[#DBE2EF]">
           <div className="p-8 w-full h-full flex flex-col justify-center items-center text-center bg-[#DBE2EF] rounded-lg gap-4">
             <div className="text-2xl md:text-4xl font-bold">
-              You finished all the terms.
+              You finished all the terms
             </div>
-            <button
-              className="flex items-center justify-center gap-2 p-2 rounded-lg"
-              onClick={() => {}}
-            >
-              <IoReloadSharp className="text-2xl md:text-4xl" />
-            </button>
-            <div className="text-base md:text-lg">Reload for more terms</div>
           </div>
         </div>
       )}
