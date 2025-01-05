@@ -7,14 +7,14 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useFetcher } from "@remix-run/react";
 import { SuperMemoGrade } from "supermemo";
+import { Term } from "~/types";
 
-export default function TermDisplay({ terms }: { terms: any[] }) {
+export default function TermDisplay({ terms }: { terms: Term[] }) {
   const [currentTerm, setCurrentTerm] = useState(0);
   const [key, setKey] = useState(0);
   const [direction, setDirection] = useState(0);
   const [practiced, setPracticed] = useState(1);
   const [practicedTerms, setPracticedTerms] = useState(terms);
-
   const slideVariants = {
     enter: (direction: number) => ({
       x: direction > 0 ? 1000 : -1000,
@@ -48,18 +48,17 @@ export default function TermDisplay({ terms }: { terms: any[] }) {
   const gradeIcons = ["😔", "🙁", "😑", "🙂", "😀", "😁"];
   const [currentGrade, setCurrentGrade] = useState(6);
   const [mode, setMode] = useState("practice");
+
+  const [isGrading, setIsGrading] = useState(false);
   const handleGradeClick = (grade: number) => {
     if (practicedTerms.length === 0) {
       return;
     }
+    setIsGrading(true);
     setCurrentGrade(grade);
-    const cardFront = document.querySelector(
-      ".react-card-front",
-    ) as HTMLElement;
-    if (practicedTerms[0].audio && cardFront?.style?.position === "absolute") {
+    if (practicedTerms[0].audio) {
       new Audio(practicedTerms[0].audio).play();
     }
-
     fetcher.submit(
       {
         intent: "practice-term",
@@ -68,7 +67,6 @@ export default function TermDisplay({ terms }: { terms: any[] }) {
       },
       { method: "post" },
     );
-
     setTimeout(async () => {
       practicedTerms.shift();
       setCurrentGrade(6);
@@ -76,11 +74,12 @@ export default function TermDisplay({ terms }: { terms: any[] }) {
       setKey(key + 1);
       setPracticed(practiced + 1);
       setPracticedTerms(practicedTerms);
+      setIsGrading(false);
     }, 1000);
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 md:p-16 gap-4 md:gap-8 text-[#112D4E]">
+    <div className="flex flex-col items-center justify-center p-4 md:p-12 gap-4 md:gap-8 text-[#112D4E]">
       <div className="flex items-center justify-center gap-4 md:gap-8 w-full mb-2">
         <button
           className={`button w-36 md:w-48 bg-[#112D4E] text-[#F9F7F7] font-bold py-2 px-2 md:px-4 
@@ -110,10 +109,7 @@ export default function TermDisplay({ terms }: { terms: any[] }) {
             border-b-[1px] border-blue-400`}
           onClick={() => {
             setMode("practice");
-            window.scrollTo({
-              top: document.body.scrollHeight,
-              behavior: "smooth",
-            });
+            setCurrentTerm(0);
           }}
         >
           {mode === "practice" ? "Practicing" : "Practice"}
@@ -187,8 +183,12 @@ export default function TermDisplay({ terms }: { terms: any[] }) {
               }}
               className="w-full absolute"
             >
-              {mode === "practice" && <FlashCard term={practicedTerms[0]} />}
-              {mode === "study" && <FlashCard term={terms[currentTerm]} />}
+              {mode === "practice" && (
+                <FlashCard term={practicedTerms[0]} isGrading={isGrading} />
+              )}
+              {mode === "study" && (
+                <FlashCard term={terms[currentTerm]} isGrading={isGrading} />
+              )}
             </motion.div>
           </AnimatePresence>
         </div>

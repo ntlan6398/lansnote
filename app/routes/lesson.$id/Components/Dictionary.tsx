@@ -1,6 +1,6 @@
 import nlp from "compromise";
 import { FiMessageSquare } from "react-icons/fi";
-export async function lookupWord(word) {
+export async function lookupWord(word: string) {
   // Get the base form of the word
   const doc = nlp(word);
 
@@ -28,7 +28,7 @@ export async function lookupWord(word) {
   }
 }
 // Add these dictionary URL helper functions at the top of your component
-const getDictionaryUrls = (word) => [
+const getDictionaryUrls = (word: string) => [
   {
     name: "Oxford",
     url: `https://www.oxfordlearnersdictionaries.com/definition/english/${word}`,
@@ -53,13 +53,26 @@ export default function Dictionary({
   selectedText,
   dictionaryData,
   handleAddCommentFromDefinition,
+}: {
+  popupRef: React.RefObject<HTMLDivElement>;
+  optionsPosition: { top: number; left: number; bottom?: number };
+  setShowDictionaryPopup: (show: boolean) => void;
+  selectedText: string;
+  dictionaryData: any;
+  handleAddCommentFromDefinition: (
+    word: string,
+    definition: any,
+    partOfSpeech: string,
+    audio: string,
+    phonetic: string,
+  ) => void;
 }) {
   let styleTop = {
     top: `${optionsPosition.top}px`,
     left: `${optionsPosition.left}px`,
     width: "300px",
     maxHeight: "400px",
-    overflowY: "auto",
+    overflowY: "auto" as const,
   };
 
   let styleBottom = {
@@ -67,7 +80,7 @@ export default function Dictionary({
     left: `${optionsPosition.left}px`,
     width: "300px",
     maxHeight: "400px",
-    overflowY: "auto",
+    overflowY: "auto" as const,
   };
   return (
     <div
@@ -104,8 +117,8 @@ export default function Dictionary({
 
       <div className="text-sm">
         {dictionaryData?.length > 0 ? (
-          dictionaryData?.map((item) => {
-            const pronunciation = item.phonetics?.find((p) => p.audio);
+          dictionaryData?.map((item: any) => {
+            const pronunciation = item.phonetics?.find((p: any) => p.audio);
             const audio = pronunciation?.audio;
             const phonetic = pronunciation?.text || item.phonetic;
             return (
@@ -131,7 +144,7 @@ export default function Dictionary({
                   )}
                 </div>
 
-                {item.meanings.map((meaning, index) => (
+                {item.meanings.map((meaning: any, index: number) => (
                   <div key={index} className="mb-4">
                     <div className="font-semibold text-blue-600 mb-2">
                       {meaning.partOfSpeech}
@@ -141,7 +154,7 @@ export default function Dictionary({
                         </div>
                       )}
                     </div>
-                    {meaning.definitions.map((def, idx) => (
+                    {meaning.definitions.map((def: any, idx: number) => (
                       <div key={idx} className="mb-3 p-2 bg-gray-50 rounded-md">
                         <div className="mb-1">
                           <span className="font-medium text-gray-700">

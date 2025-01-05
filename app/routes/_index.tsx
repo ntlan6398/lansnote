@@ -7,7 +7,7 @@ export const meta: MetaFunction = () => {
 
 export default function Index() {
   return (
-    <div className="h-screen flex flex-col items-center pt-20 bg-slate-900">
+    <div className=" flex flex-col items-center pt-20 bg-slate-900">
       <div className="flex w-full justify-evenly max-w-md mt-8 rounded-3xl p-10 bg-slate-800">
         <Link
           to="/signup"

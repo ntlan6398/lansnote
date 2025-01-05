@@ -1,6 +1,15 @@
 import { Link, useFetcher } from "@remix-run/react";
+import { LessonData } from "~/types";
 
-export default function LessonBoard({ lessonCards }: { lessonCards: any[] }) {
+export default function LessonBoard({
+  lessonCards,
+}: {
+  lessonCards: {
+    title: string;
+    count: number;
+    lessons: LessonData[];
+  }[];
+}) {
   const fetcher = useFetcher();
   const deleteLesson = (lessonId: string) => {
     const formData = new FormData();
@@ -11,11 +20,11 @@ export default function LessonBoard({ lessonCards }: { lessonCards: any[] }) {
     });
   };
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8 p-4 md:p-8">
+    <div className="flex h-full overflow-x-auto gap-8 p-8">
       {lessonCards.map((card) => (
         <div
           key={card.title}
-          className="rounded-lg p-4 min-h-[400px] md:min-h-screen"
+          className="flex-1 shrink-0 min-w-[300px] rounded-lg p-4 flex flex-col h-full"
           style={{ backgroundColor: "#DBE2EF" }}
         >
           <h2 className="font-bold text-lg" style={{ color: "#112D4E" }}>
@@ -24,7 +33,7 @@ export default function LessonBoard({ lessonCards }: { lessonCards: any[] }) {
           <div className="text-2xl font-bold mb-4" style={{ color: "#3F72AF" }}>
             {card.count}
           </div>
-          <div className="space-y-2 text-left">
+          <div className="space-y-2 text-left overflow-y-auto flex-1 h-full">
             {card.lessons.map((lesson: any) => {
               return (
                 <Link

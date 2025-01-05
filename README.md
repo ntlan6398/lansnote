@@ -1,6 +1,6 @@
 # LANSNOTE
 
-#### Video Demo: <URL HERE>
+#### Video Demo: [LANSNOTE](https://www.youtube.com/watch?v=P3yI7uEqLDs)
 
 #### Description:
 

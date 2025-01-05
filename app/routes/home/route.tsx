@@ -3,20 +3,31 @@ import {
   type LoaderFunctionArgs,
 } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SuperMemoGrade } from "supermemo";
 import { requireAuthCookie } from "~/auth/auth";
 import LessonBoard from "./components/LesonBoard";
 import TermDisplay from "./components/TermDisplay";
-import { deleteLesson, getHomeData, practiceTerm } from "./queries";
+import { getLessonsbyUserId, deleteLesson } from "~/queries/lessons";
+import { getSubjectsByUserId } from "~/queries/subjects";
+import { getActiveTermsbyUserId, practiceTerm } from "~/queries/terms";
 import dayjs from "dayjs";
+import { Lesson, LessonData, ClassifiedLessons } from "~/types";
+
+interface SerializedLessonData extends Omit<LessonData, "reviewDate"> {
+  reviewDate: string;
+}
+
 export const meta = () => {
   return [{ title: "Home" }];
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
   let userId = await requireAuthCookie(request);
-  let { subjects, lists, lessons, terms } = await getHomeData(userId);
+  let subjects = await getSubjectsByUserId(userId);
+  let lessons = await getLessonsbyUserId(userId);
+  let terms = await getActiveTermsbyUserId(userId);
+
   const subjectIds = subjects.reduce<Record<number, string>>((acc, subject) => {
     acc[subject.id] = subject.name;
     return acc;
@@ -30,8 +41,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
     onTrack: lesson.onTrack,
   }));
 
-  return { subjects, lists, lessons: lessonData, terms };
+  return { lessons: lessonData, terms };
 }
+
 export async function action({ request }: ActionFunctionArgs) {
   let formData = await request.formData();
   const intent = formData.get("intent");
@@ -51,16 +63,21 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Projects() {
-  const { subjects, lists, lessons, terms } = useLoaderData<typeof loader>();
-  const now = dayjs().format("YYYY-MM-DD");
-  const classifiedLessons = lessons.reduce(
-    (acc: any, lesson) => {
-      const review = lesson.reviewDate.split("T")[0];
+  const { lessons, terms } = useLoaderData<typeof loader>();
+  const today = dayjs().format("YYYY-MM-DD");
+  const [activeTab, setActiveTab] = useState("lessons");
 
-      const diff = Math.ceil(
-        (new Date(now).getTime() - new Date(review).getTime()) /
-          (1000 * 60 * 60 * 24),
-      );
+  useEffect(() => {
+    const currentTab = sessionStorage.getItem("currentTab");
+    if (currentTab) {
+      setActiveTab(currentTab);
+    }
+  }, []);
+
+  const classifiedLessons = lessons.reduce<ClassifiedLessons>(
+    (acc: ClassifiedLessons, lesson: SerializedLessonData) => {
+      const review = lesson.reviewDate.split("T")[0];
+      const diff = dayjs(today).diff(review, "day");
       if (diff === 0) {
         acc.today.push(lesson);
       } else if (diff === 1) {
@@ -82,7 +99,6 @@ export default function Projects() {
       nextThirtyDays: [],
     },
   );
-  const [activeTab, setActiveTab] = useState("lessons");
 
   const lessonCards = [
     {
@@ -113,7 +129,7 @@ export default function Projects() {
   ];
 
   return (
-    <div className="h-full flex flex-col items-center justify-center">
+    <div className="h-screen flex flex-col items-center">
       <h1 className="text-2xl font-bold my-8 text-[#112D4E]">
         What is waiting for you?
       </h1>
@@ -124,7 +140,10 @@ export default function Projects() {
               ? "bg-[#3F72AF] text-white w-1/2"
               : "bg-[#DBE2EF] text-[#3F72AF] w-1/3"
           }`}
-          onClick={() => setActiveTab("lessons")}
+          onClick={() => {
+            setActiveTab("lessons");
+            sessionStorage.setItem("currentTab", "lessons");
+          }}
         >
           Lessons
         </button>
@@ -134,12 +153,15 @@ export default function Projects() {
               ? "bg-[#3F72AF] text-white w-1/2"
               : "bg-[#DBE2EF] text-[#3F72AF] w-1/3"
           }`}
-          onClick={() => setActiveTab("terms")}
+          onClick={() => {
+            setActiveTab("terms");
+            sessionStorage.setItem("currentTab", "terms");
+          }}
         >
           Terms
         </button>
       </div>
-      <div className="w-full min-h-screen bg-[#3F72AF] rounded-t-lg">
+      <div className="w-full h-full bg-[#3F72AF] rounded-t-lg overflow-auto">
         {activeTab === "lessons" && <LessonBoard lessonCards={lessonCards} />}
         {activeTab === "terms" && <TermDisplay terms={terms} />}
       </div>

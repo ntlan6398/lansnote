@@ -1,6 +1,5 @@
 import { redirect } from "@remix-run/node";
 import { useFetcher, useLoaderData, useOutletContext } from "@remix-run/react";
-
 import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { getAuthFromRequest } from "../../auth/auth";
@@ -8,27 +7,42 @@ import CommentPopup from "./Components/CommentPopup";
 import ContentEditable from "./Components/ContentEditable";
 import Dictionary, { lookupWord } from "./Components/Dictionary";
 import OptionsBar from "./Components/OptionsBar";
+import { createLesson, getLessonById, updateLesson } from "~/queries/lessons";
 import {
   createTerm,
   findExistingTerms,
-  getLesson,
-  updateLesson,
   updateTerm,
-  createNewLesson,
   updatePracticeTerms,
-} from "./queries";
+} from "~/queries/terms";
 import { getSelection, highLightRange } from "./utils";
 import dayjs from "dayjs";
+import type { Lesson, List, Subject, Term } from "~/types";
+
+interface LoaderData {
+  lesson: Omit<Lesson, "startDate" | "reviewDate"> & {
+    startDate: string;
+    reviewDate: string;
+  };
+  comments: Term[];
+  userId: string;
+}
+
 export const meta = () => {
   return [{ title: "Lesson" }];
 };
 const REVIEW_INTERVAL = [1, 3, 5, 10, 20, 40, 50];
-export async function loader({ request, params }) {
+export async function loader({
+  request,
+  params,
+}: {
+  request: Request;
+  params: { id: string };
+}) {
   const lessonId = params.id;
   let userId = await getAuthFromRequest(request);
-  if (lessonId === "new") {
-    const today = new URL(request.url).searchParams.get("today");
-    const lesson = await createNewLesson(userId, today);
+  if (lessonId === "new" && userId) {
+    const today = new URL(request.url).searchParams.get("today") as string;
+    const lesson = await createLesson(userId, today);
     if (!lesson) {
       throw redirect("/home");
     }
@@ -38,14 +52,19 @@ export async function loader({ request, params }) {
       },
     });
   }
-  const { lesson, comments } = await getLesson(lessonId);
+  const { lesson, comments } = await getLessonById(lessonId);
   if (!lesson) {
     throw redirect("/home");
   }
   return { lesson, comments, userId };
 }
-export async function action({ request, params }) {
-  let userId = await getAuthFromRequest(request);
+export async function action({
+  request,
+  params,
+}: {
+  request: Request;
+  params: { id: string };
+}) {
   const formData = await request.formData();
   const intent = formData.get("intent");
   switch (intent) {
@@ -55,23 +74,23 @@ export async function action({ request, params }) {
       return { lesson };
 
     case "lookup-term":
-      const word = formData.get("word");
+      const word = formData.get("word") as string;
       const existingTerms = await findExistingTerms(word);
       return { existingTerms };
 
     case "create-term":
-      const comment = JSON.parse(formData.get("comment"));
+      const comment = JSON.parse(formData.get("comment") as string);
       const newTerm = await createTerm(comment);
       return { newTerm };
 
     case "update-term":
-      const term = JSON.parse(formData.get("comment"));
+      const term = JSON.parse(formData.get("comment") as string);
       const updatedTerm = await updateTerm(term);
       return { updatedTerm };
 
     case "update-practice-terms":
-      const terms = JSON.parse(formData.get("terms"));
-      const grades = JSON.parse(formData.get("grades"));
+      const terms = JSON.parse(formData.get("terms") as string);
+      const grades = JSON.parse(formData.get("grades") as string);
       await updatePracticeTerms(terms, grades);
       return redirect(`/lesson/${params.id}`);
 
@@ -85,57 +104,68 @@ export default function Lesson() {
     lesson: initialLesson,
     comments: initialComments,
     userId,
-  } = useLoaderData();
+  } = useLoaderData() as LoaderData;
   const [lesson, setLesson] = useState(initialLesson);
-  const { subjects, lists } = useOutletContext();
+  const { subjects, lists } = useOutletContext() as {
+    subjects: Subject[];
+    lists: List[];
+  };
   const fetcher = useFetcher();
   const [selectedText, setSelectedText] = useState("");
   const [showOptionsBar, setShowOptionsBar] = useState(false);
-  const [optionsPosition, setOptionsPosition] = useState({ top: 0, left: 0 });
+  const [optionsPosition, setOptionsPosition] = useState<{
+    top: number;
+    left: number;
+    bottom?: number;
+  }>({
+    top: 0,
+    left: 0,
+  });
   const [showDictionaryPopup, setShowDictionaryPopup] = useState(false);
-  const [dictionaryData, setDictionaryData] = useState(null);
-  const popupRef = useRef(null);
+  const [dictionaryData, setDictionaryData] = useState<any>(null);
+  const popupRef = useRef<HTMLDivElement>(null);
   const [showCommentPopup, setShowCommentPopup] = useState(false);
-  const [comments, setComments] = useState(
-    initialComments.reduce((acc, c) => {
-      acc[c.id] = c;
+  const [comments, setComments] = useState<Record<string, Term>>(
+    initialComments?.reduce((acc: Record<string, Term>, comment: Term) => {
+      acc[comment.id] = comment;
       return acc;
-    }, {}),
+    }, {}) ?? {},
   );
-  const [termsGrade, setTermsGrade] = useState(
-    initialComments.reduce((acc, c) => {
-      acc[c.id] = 5;
+  const [termsGrade, setTermsGrade] = useState<Record<string, number>>(
+    initialComments?.reduce((acc: Record<string, number>, comment: Term) => {
+      acc[comment.id] = 5;
       return acc;
-    }, {}),
+    }, {}) ?? {},
   );
   const [selectedSentence, setSelectedSentence] = useState("");
-  const [activeComment, setActiveComment] = useState({
+  const [activeComment, setActiveComment] = useState<Term>({
     id: "None",
     term: "",
-    type: "",
+    type: "others",
     definition: "",
     example: "",
     audio: null,
     phonetic: null,
     createdAt: "",
-    lastReview: null,
-    nextReview: null,
+    lastReview: "",
+    nextReview: "",
     efactor: 2.5,
     interval: 0,
     repetition: 0,
     accountId: userId,
-    listId: "",
+    listId: lists[0].id,
   });
-  const [lessonContent, setLessonContent] = useState(lesson.content);
-  const [existingTerms, setExistingTerms] = useState([]);
+  const [lessonContent, setLessonContent] = useState(lesson?.content ?? "");
+  const [existingTerms, setExistingTerms] = useState<Term[]>([]);
   const [isSavingTerm, setIsSavingTerm] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const optionsBarRef = useRef(null);
-  const [saveStatus, setSaveStatus] = useState(null);
+  const [saveStatus, setSaveStatus] = useState<
+    "saving" | "saved" | "error" | null
+  >(null);
   const [confirmReview, setConfirmReview] = useState(false);
-  const [selectedSection, setSelectedSection] = useState(null);
+  const [selectedSection, setSelectedSection] = useState(0);
 
-  const onClickSection = (index) => {
+  const onClickSection = (index: number) => {
     setSelectedSection(index);
     setConfirmReview(true);
   };
@@ -143,7 +173,7 @@ export default function Lesson() {
   const handleCommentClick = async () => {
     setShowCommentPopup(true);
     setShowOptionsBar(false);
-    const selection = window.getSelection();
+    const selection = window.getSelection() as Selection;
     const range = selection.getRangeAt(0);
     const { leftPosition, topPosition, bottomPosition } =
       calculatePopupSize(range);
@@ -166,16 +196,16 @@ export default function Lesson() {
 
     const formData = new FormData();
     formData.append("intent", "lookup-term");
-    formData.append("word", dictionaryData.word || selectedText);
+    formData.append("word", (dictionaryData?.word || selectedText) as string);
     const result = await fetcher.submit(formData, { method: "post" });
     return result;
   };
-  const [rangeSelection, setRangeSelection] = useState(null);
+  const [rangeSelection, setRangeSelection] = useState<Range | null>(null);
   function handleTextSelection() {
     const { text, sentence } = getSelection();
     setSelectedSentence(sentence.trim());
     if (text) {
-      const selection = window.getSelection();
+      const selection = window.getSelection() as Selection;
       const range = selection.getRangeAt(0);
       setRangeSelection(range);
       const rect = range.getBoundingClientRect();
@@ -195,7 +225,7 @@ export default function Lesson() {
       setShowOptionsBar(false);
     }
   }
-  const handleCommentSubmit = async (e) => {
+  const handleCommentSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSavingTerm(true);
     const formData = new FormData();
@@ -214,11 +244,11 @@ export default function Lesson() {
     }
   };
   const handleAddCommentFromDefinition = (
-    term,
-    definition,
-    partOfSpeech,
-    audio,
-    phonetic,
+    term: string,
+    definition: any,
+    partOfSpeech: string,
+    audio: string,
+    phonetic: string,
   ) => {
     setShowDictionaryPopup(false);
     setShowCommentPopup(true);
@@ -242,8 +272,9 @@ export default function Lesson() {
     } catch (error) {
       console.error("Failed to fetch dictionary data:", error);
     }
-    const { leftPosition, topPosition, bottomPosition } =
-      calculatePopupSize(rangeSelection);
+    const { leftPosition, topPosition, bottomPosition } = calculatePopupSize(
+      rangeSelection as Range,
+    );
     setOptionsPosition({
       top: Math.max(10, topPosition),
       left: Math.max(10, leftPosition),
@@ -253,32 +284,31 @@ export default function Lesson() {
     setShowOptionsBar(false);
     setShowDictionaryPopup(true);
   };
-  function calculatePopupSize(termElement) {
-    const rect = termElement.getBoundingClientRect();
+  function calculatePopupSize(range: Range | HTMLElement) {
+    const rect = range.getBoundingClientRect();
     const commentPopupWidth = 400;
     const commentPopupHeight = 450;
-    // Approximate width of the comment popup
-    // Calculate left position ensuring the popup stays within viewport
+
     let leftPosition = rect.left;
     if (leftPosition + commentPopupWidth > window.innerWidth) {
-      leftPosition = window.innerWidth - commentPopupWidth - 20; // 20px padding from right edge
+      leftPosition = window.innerWidth - commentPopupWidth - 20;
     }
+
     let bottomPosition = 0;
     let topPosition = rect.bottom;
-    // if (topPosition + commentPopupHeight > window.innerHeight) {
-    //   topPosition = rect.bottom - 350; // 20px padding from bottom edge
-    // }
+
     if (topPosition + commentPopupHeight > window.innerHeight) {
       topPosition = 0;
       bottomPosition =
-        window.innerHeight - rect.top + (rect.bottom - rect.top) / 2; // 20px padding from bottom edge
+        window.innerHeight - rect.top + (rect.bottom - rect.top) / 2;
     }
+
     return { leftPosition, topPosition, bottomPosition };
   }
-  const handleTermClick = (e) => {
-    const termElement = e.target;
+  const handleTermClick = (e: MouseEvent) => {
+    const termElement = e.target as HTMLElement;
     if (termElement.hasAttribute("data-comment")) {
-      const termId = termElement.getAttribute("data-term-id");
+      const termId = termElement.getAttribute("data-term-id") as string;
       const comment = comments[termId];
 
       if (comment) {
@@ -290,7 +320,7 @@ export default function Lesson() {
           left: Math.max(10, leftPosition), // Ensure at least 10px from left edge
           bottom: bottomPosition ? Math.max(10, bottomPosition) : 0,
         });
-        setTermsGrade((prev) => {
+        setTermsGrade((prev: Record<string, number>) => {
           const newTermsGrade = { ...prev };
           newTermsGrade[termId] = prev[termId] - 1 > 0 ? prev[termId] - 1 : 0;
           return newTermsGrade;
@@ -302,22 +332,28 @@ export default function Lesson() {
       }
     }
   };
-  const handleOnTrackChange = (index) => {
-    let newOnTrack;
+  const handleOnTrackChange = (index: number) => {
+    let newOnTrack: number;
     newOnTrack = index + 1;
-    setLesson({
-      ...lesson,
-      onTrack: newOnTrack,
-      reviewDate:
-        dayjs().add(REVIEW_INTERVAL[index], "day").format("YYYY-MM-DD") +
-        "T00:00:00.000Z",
+    setLesson((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        onTrack: newOnTrack,
+        reviewDate:
+          dayjs().add(REVIEW_INTERVAL[index], "day").format("YYYY-MM-DD") +
+          "T00:00:00.000Z",
+      };
     });
     let grades = termsGrade;
     if (newOnTrack === 1) {
-      grades = Object.keys(comments).reduce((acc, commentId) => {
-        acc[commentId] = 4;
-        return acc;
-      }, {});
+      grades = Object.keys(comments).reduce(
+        (acc: Record<string, number>, commentId: string) => {
+          acc[commentId] = 4;
+          return acc;
+        },
+        {},
+      );
     }
     const formData = new FormData();
     formData.append("intent", "update-practice-terms");
@@ -327,19 +363,26 @@ export default function Lesson() {
   };
   const [firstRender, setFirstRender] = useState(false);
   useEffect(() => {
-    const lessonContainer = document.getElementById("lesson-container");
-    sessionStorage.setItem("lessonContent", lessonContainer.innerHTML);
-    if (lesson.content) {
+    const lessonContainer = document.getElementById(
+      "lesson-container",
+    ) as HTMLElement;
+    sessionStorage.setItem(
+      "lessonContent",
+      (lessonContainer?.innerHTML || "") as string,
+    );
+    if (lesson?.content) {
       lessonContainer.innerHTML = lesson.content;
       sessionStorage.setItem("lessonContent", lesson.content);
     }
-    const contentContainer = lessonContainer.querySelector("#content");
-    const clonedContent = contentContainer.cloneNode(false);
+    const contentContainer = lessonContainer.querySelector(
+      "#content",
+    ) as HTMLElement;
+    const clonedContent = contentContainer.cloneNode(false) as HTMLElement;
     const children = contentContainer.children;
     for (const child of children) {
       let content = "";
       if (child.innerHTML) {
-        content = child.querySelector(".edit-container").innerHTML;
+        content = child.querySelector(".edit-container")?.innerHTML as string;
       }
       const container = document.createElement("div");
       const root = createRoot(container);
@@ -349,7 +392,7 @@ export default function Lesson() {
     contentContainer.remove();
     lessonContainer.appendChild(clonedContent);
     // Create a mutation observer
-    const observer = new MutationObserver((mutations) => {
+    const observer = new MutationObserver((mutations: MutationRecord[]) => {
       const content = sessionStorage.getItem("lessonContent");
       if (content !== lessonContainer.innerHTML) {
         setLessonContent(lessonContainer.innerHTML);
@@ -373,7 +416,7 @@ export default function Lesson() {
     };
   }, []);
   useEffect(() => {
-    let timeout;
+    let timeout: NodeJS.Timeout;
     if (firstRender) {
       timeout = setTimeout(() => {
         if (window.innerWidth < 640) {
@@ -400,15 +443,17 @@ export default function Lesson() {
     return () => clearTimeout(timeout);
   }, [firstRender]);
   useEffect(() => {
-    const lessonContainer = document.getElementById("lesson-container");
+    const lessonContainer = document.getElementById(
+      "lesson-container",
+    ) as HTMLElement;
     lessonContainer.addEventListener("click", handleTermClick);
     return () => {
       lessonContainer.removeEventListener("click", handleTermClick);
     };
   }, [comments]);
   useEffect(() => {
-    let timeoutId;
-    const debounce = (func, delay) => {
+    let timeoutId: NodeJS.Timeout;
+    const debounce = (func: () => Promise<void>, delay: number) => {
       clearTimeout(timeoutId);
       setSaveStatus("saving");
       timeoutId = setTimeout(async () => {
@@ -438,12 +483,12 @@ export default function Lesson() {
     return () => clearTimeout(timeoutId);
   }, [lesson, lessonContent]);
   useEffect(() => {
-    function handleClickOutside(event) {
+    function handleClickOutside(event: MouseEvent) {
       // Handle dictionary popup
       if (
         showDictionaryPopup &&
         popupRef.current &&
-        !popupRef.current.contains(event.target)
+        !popupRef.current.contains(event.target as Node)
       ) {
         setShowDictionaryPopup(false);
       }
@@ -451,8 +496,8 @@ export default function Lesson() {
       // Handle comment popup
       if (showCommentPopup) {
         const isClickOutsidePopup =
-          popupRef.current && !popupRef.current.contains(event.target);
-        const isClickOutsideOptionsBar = !event.target.closest(".options-bar");
+          popupRef.current && !popupRef.current.contains(event.target as Node);
+        const isClickOutsideOptionsBar = !event.target?.closest(".options-bar");
 
         if (isClickOutsidePopup && isClickOutsideOptionsBar) {
           setShowCommentPopup(false);
@@ -470,10 +515,14 @@ export default function Lesson() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showDictionaryPopup, showCommentPopup]);
-  const fetcherData = fetcher.data;
+  const fetcherData = fetcher.data as {
+    updatedTerm?: Term;
+    newTerm?: Term;
+    existingTerms?: Term[];
+  };
   useEffect(() => {
     if (fetcherData?.updatedTerm) {
-      setComments((prev) => {
+      setComments((prev: Record<string, Term>) => {
         const newComments = { ...prev };
         newComments[fetcherData.updatedTerm.id] = fetcherData.updatedTerm;
         return newComments;
@@ -487,21 +536,25 @@ export default function Lesson() {
     }
     if (fetcherData?.newTerm) {
       highLightRange(
-        rangeSelection,
-        fetcherData.newTerm.id,
+        rangeSelection as Range,
+        fetcherData?.newTerm?.id,
         selectedText,
-        fetcherData.newTerm.type,
+        fetcherData?.newTerm?.type,
       );
-      setActiveComment(fetcherData.newTerm);
+      setActiveComment(fetcherData?.newTerm);
       setSaveSuccess(true);
-      setComments((prev) => {
+      setComments((prev: Record<string, Term>) => {
         const newComments = { ...prev };
-        newComments[fetcherData.newTerm.id] = fetcherData.newTerm;
+        if (fetcherData?.newTerm?.id) {
+          newComments[fetcherData.newTerm.id] = fetcherData.newTerm;
+        }
         return newComments;
       });
-      setTermsGrade((prev) => {
+      setTermsGrade((prev: Record<string, number>) => {
         const newTermsGrade = { ...prev };
-        newTermsGrade[fetcherData.newTerm.id] = 5;
+        if (fetcherData?.newTerm?.id) {
+          newTermsGrade[fetcherData.newTerm.id] = 5;
+        }
         return newTermsGrade;
       });
       setTimeout(() => {
@@ -509,8 +562,8 @@ export default function Lesson() {
         setSaveSuccess(false);
       }, 1500);
     }
-    if (fetcherData?.existingTerms?.length > 0) {
-      setExistingTerms(fetcherData.existingTerms);
+    if ((fetcherData?.existingTerms ?? []).length > 0) {
+      setExistingTerms(fetcherData?.existingTerms ?? []);
       setShowCommentPopup(false);
       setShowCommentPopup(true);
     }
@@ -518,18 +571,21 @@ export default function Lesson() {
 
   return (
     <div>
-      <div className="grid grid-cols-1 md:grid-cols-8 mx-2 md:mx-4">
+      <div className="min-h-screen grid grid-cols-1 md:grid-cols-8 mx-2 md:mx-4">
         <div className="col-span-1 md:col-span-8 my-2 md:my-4 p-2 md:p-4 flex flex-col gap-2 bg-blue-50 items-center">
           <textarea
             className="text-center text-xl md:text-2xl font-bold w-full max-w-full block break-words break-keep min-h-[60px] resize-none overflow-hidden px-2 bg-blue-50"
             id="title"
             placeholder="Untitled"
-            rows="auto"
-            value={lesson.title === "Untitled" ? "" : lesson.title}
+            rows={1}
+            value={lesson?.title === "Untitled" ? "" : lesson?.title}
             onChange={(e) => {
               e.target.style.height = "auto";
               e.target.style.height = e.target.scrollHeight + "px";
-              setLesson({ ...lesson, title: e.target.value });
+              setLesson((prev) => {
+                if (!prev) return prev;
+                return { ...prev, title: e.target.value as string };
+              });
             }}
           />
           <div className="px-1 md:px-2 w-full flex flex-row items-center gap-4">
@@ -539,12 +595,15 @@ export default function Lesson() {
             <select
               className="bg-blue-50 w-fit"
               id="subject"
-              value={lesson.subjectId}
+              value={lesson?.subjectId}
               onChange={(e) => {
-                setLesson({ ...lesson, subjectId: parseInt(e.target.value) });
+                setLesson((prev) => {
+                  if (!prev) return prev;
+                  return { ...prev, subjectId: parseInt(e.target.value) };
+                });
               }}
             >
-              {subjects.map((subject) => (
+              {subjects.map((subject: Subject) => (
                 <option value={subject.id}>{subject.name}</option>
               ))}
             </select>
@@ -557,27 +616,37 @@ export default function Lesson() {
               className="bg-blue-50"
               type="date"
               id="startDate"
-              value={dayjs(lesson.startDate).toISOString().split("T")[0]}
+              value={
+                dayjs(lesson?.startDate)
+                  .toISOString()
+                  .split("T")[0]
+              }
               onChange={(e) => {
-                if (lesson.onTrack === 0) {
-                  setLesson({
-                    ...lesson,
-                    startDate: new Date(e.target.value).toISOString(),
-                    reviewDate: new Date(e.target.value).toISOString(),
+                if (lesson?.onTrack === 0) {
+                  setLesson((prev) => {
+                    if (!prev) return prev;
+                    return {
+                      ...prev,
+                      startDate: new Date(e.target.value).toISOString(),
+                      reviewDate: new Date(e.target.value).toISOString(),
+                    };
                   });
                 } else {
                   let totalDays = 0;
-                  for (let i = 0; i < lesson.onTrack; i++) {
+                  for (let i = 0; i < lesson?.onTrack; i++) {
                     totalDays += REVIEW_INTERVAL[i];
                   }
-                  setLesson({
-                    ...lesson,
-                    startDate: new Date(e.target.value).toISOString(),
-                    reviewDate: new Date(
-                      new Date(e.target.value).setDate(
-                        new Date(e.target.value).getDate() + totalDays,
-                      ),
-                    ).toISOString(),
+                  setLesson((prev) => {
+                    if (!prev) return prev;
+                    return {
+                      ...prev,
+                      startDate: new Date(e.target.value).toISOString(),
+                      reviewDate: new Date(
+                        new Date(e.target.value).setDate(
+                          new Date(e.target.value).getDate() + totalDays,
+                        ),
+                      ).toISOString(),
+                    };
                   });
                 }
               }}
@@ -635,7 +704,6 @@ export default function Lesson() {
       </div>
       {showOptionsBar && (
         <OptionsBar
-          optionsBarRef={optionsBarRef}
           optionsPosition={optionsPosition}
           setShowOptionsBar={setShowOptionsBar}
           handleCommentClick={handleCommentClick}

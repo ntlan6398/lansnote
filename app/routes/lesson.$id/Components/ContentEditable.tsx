@@ -8,7 +8,11 @@ import {
   PiRowsPlusBottom,
   PiRowsPlusTop,
 } from "react-icons/pi";
-export default function ContentEditable({ content = "" }: { content: string }) {
+export default function ContentEditable({
+  content = "",
+}: {
+  content?: string;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const [col, setCol] = useState(6);
   const [separated, setSeparated] = useState(false);

@@ -26,10 +26,12 @@ import {
 } from "react-icons/fi";
 import { LoginIcon, LogoutIcon } from "./icons/icons";
 import { getAuthFromRequest } from "./auth/auth";
-import { getNavData, addSubject, addList } from "./routes/home/queries";
+import { getListsByUserId, addList } from "~/queries/lists";
+import { getSubjectsByUserId, addSubject } from "~/queries/subjects";
 import "./styles.css";
 import { useState } from "react";
 import dayjs from "dayjs";
+import { List } from "@prisma/client";
 
 export function shouldRevalidate({ formAction }: ShouldRevalidateFunctionArgs) {
   return formAction && ["/login", "/signup", "logout"].includes(formAction);
@@ -42,7 +44,8 @@ export async function loader({ request }: DataFunctionArgs) {
   let subjects;
   let lists;
   if (userId) {
-    ({ subjects, lists } = await getNavData(userId));
+    subjects = await getSubjectsByUserId(userId);
+    lists = await getListsByUserId(userId);
   }
 
   return { userId, subjects, lists };
@@ -56,13 +59,15 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (action === "add-list") {
     await addList(userId as string, name as string);
-    const { subjects, lists } = await getNavData(userId as string);
+    const lists = await getListsByUserId(userId as string);
+    const subjects = await getSubjectsByUserId(userId as string);
     return { subjects, lists };
   }
 
   if (action === "add-subject") {
     await addSubject(userId as string, name as string);
-    const { subjects, lists } = await getNavData(userId as string);
+    const subjects = await getSubjectsByUserId(userId as string);
+    const lists = await getListsByUserId(userId as string);
     return { subjects, lists };
   }
 
@@ -75,7 +80,7 @@ export default function App() {
     subjects: loaderSubjects,
     lists: loaderLists,
   } = useLoaderData<typeof loader>();
-  const fetcher = useFetcher<{ subjects: any[]; lists: any[] }>();
+  const fetcher = useFetcher<{ subjects: Subject[]; lists: List[] }>();
   const fetcherData = fetcher.data;
   const subjects = fetcherData?.subjects || loaderSubjects || [];
   const lists = fetcherData?.lists || loaderLists || [];
@@ -138,7 +143,7 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <div className="bg-[#112D4E] border-b border-slate-800 flex items-center justify-between py-2 sm:py-4 px-4 sm:px-8 box-border">
+        <div className=" bg-[#112D4E] border-b border-slate-800 flex items-center justify-between py-2 sm:py-4 px-4 sm:px-8 box-border">
           <Link to="/home" className="block leading-3 w-1/4 sm:w-1/3">
             <div
               className="font-black text-xl sm:text-2xl md:text-3xl text-[#F9F7F7] w-fit"

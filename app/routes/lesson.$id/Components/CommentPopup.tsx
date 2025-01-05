@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { highLightRange } from "../utils";
 import { FiSearch } from "react-icons/fi";
+import type { List, Term } from "~/types";
 
 export default function CommentPopup({
   popupRef,
@@ -20,19 +21,19 @@ export default function CommentPopup({
   handleDictionarySearch,
 }: {
   popupRef: React.RefObject<HTMLDivElement>;
-  optionsPosition: { top: number; left: number; bottom: number };
+  optionsPosition: { top: number; left: number; bottom?: number };
   setShowCommentPopup: (show: boolean) => void;
   handleCommentSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
-  lists: any[];
+  lists: List[];
   isSavingTerm: boolean;
   saveSuccess: boolean;
-  setActiveComment: (comment: any) => void;
-  activeComment: any;
-  existingTerms?: any[];
-  setComments: (comments: any) => void;
-  rangeSelection: any;
+  setActiveComment: (comment: Term) => void;
+  activeComment: Term;
+  existingTerms?: Term[];
+  setComments: React.Dispatch<React.SetStateAction<Record<string, Term>>>;
+  rangeSelection: Range;
   selectedText: string;
-  setTermsGrade: (termsGrade: any) => void;
+  setTermsGrade: React.Dispatch<React.SetStateAction<Record<string, number>>>;
   handleDictionarySearch: () => void;
 }) {
   let styleTop = {
@@ -48,14 +49,14 @@ export default function CommentPopup({
   };
   const [showDefinitions, setShowDefinitions] = useState(false);
 
-  const handleDefinitionClick = (term: any) => {
+  const handleDefinitionClick = (term: Term) => {
     setActiveComment(term);
-    setComments((prev: any) => {
+    setComments((prev: Record<string, Term>) => {
       const newComments = { ...prev };
       newComments[term.id] = term;
       return newComments;
     });
-    setTermsGrade((prev: any) => {
+    setTermsGrade((prev: Record<string, number>) => {
       const newTermsGrade = { ...prev };
       if (prev[term.id]) {
         newTermsGrade[term.id] = prev[term.id] - 1 > 0 ? prev[term.id] - 1 : 0;
@@ -87,8 +88,8 @@ export default function CommentPopup({
                 setActiveComment({ ...activeComment, type: e.target.value })
               }
             >
-              <option value="" selected={activeComment.type === null}>
-                Part of Speech
+              <option value="others" selected={activeComment.type === "others"}>
+                Others
               </option>
               <option value="noun" selected={activeComment.type === "noun"}>
                 Noun
@@ -255,12 +256,12 @@ export default function CommentPopup({
                   `[data-term-id="${activeComment.id}"]`,
                 );
 
-                setComments((prev: any) => {
+                setComments((prev: Record<string, Term>) => {
                   const newComments = { ...prev };
                   delete newComments[activeComment.id];
                   return newComments;
                 });
-                setTermsGrade((prev: any) => {
+                setTermsGrade((prev: Record<string, number>) => {
                   const newTermsGrade = { ...prev };
                   delete newTermsGrade[activeComment.id];
                   return newTermsGrade;

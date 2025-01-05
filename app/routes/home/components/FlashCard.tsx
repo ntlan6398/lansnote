@@ -1,12 +1,24 @@
 import { useState } from "react";
 import Flip from "react-card-flip";
+import { Term } from "~/types";
 
-const FlashCard = ({ term }: { term: any | undefined }) => {
+const FlashCard = ({
+  term,
+  isGrading,
+}: {
+  term: Term | undefined;
+  isGrading: boolean;
+}) => {
   const [isFlipped, setIsFlipped] = useState(
-    term?.repetition % 2 !== 0 || term?.repetition === undefined,
+    (term?.repetition && term?.repetition % 2 !== 0) ||
+      term?.repetition === undefined,
   );
-  if (term?.audio && !isFlipped) {
-    new Audio(term?.audio).play();
+  if (term?.audio && !isFlipped && !isGrading) {
+    setTimeout(() => {
+      if (term.audio) {
+        new Audio(term.audio).play();
+      }
+    }, 500);
   }
   return (
     <div className="w-full h-[24rem] md:h-[32rem] rounded-lg">

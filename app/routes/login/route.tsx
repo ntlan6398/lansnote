@@ -68,6 +68,7 @@ export default function Signup() {
                 name="email"
                 type="email"
                 autoComplete="email"
+                placeholder="test123@gmail.com"
                 aria-describedby={
                   actionResult?.errors?.email ? "email-error" : "login-header"
                 }
@@ -88,6 +89,7 @@ export default function Signup() {
                 id="password"
                 name="password"
                 type="password"
+                placeholder="123456"
                 autoComplete="current-password"
                 aria-describedby="password-error"
                 required

@@ -6,16 +6,12 @@ import {
 import { useFetcher, useLoaderData, useSearchParams } from "@remix-run/react";
 import { getAuthFromRequest } from "../../auth/auth";
 import { FaTrash } from "react-icons/fa";
-import {
-  createTerm,
-  deleteTerm,
-  getList,
-  getTerms,
-  updateTerm,
-} from "./queries";
+import { createTerm, deleteTerm, getTerms, updateTerm } from "~/queries/terms";
+import { getListById } from "~/queries/lists";
 import { useState } from "react";
 import { FaSave, FaTimes, FaEdit, FaSearch } from "react-icons/fa";
 import { FiPlus } from "react-icons/fi";
+import { Term } from "~/types";
 export const meta = () => {
   return [{ title: "List" }];
 };
@@ -30,7 +26,7 @@ export async function loader({ request, params }: DataFunctionArgs) {
   const itemsPerPage = 10;
 
   const listId = parseInt(params.id as string);
-  const list = await getList(listId);
+  const list = await getListById(listId);
   // Update your database query to include pagination
   const { terms, totalItems } = await getTerms(listId, {
     page,
@@ -107,12 +103,12 @@ export default function Subject() {
   const [searchParams, setSearchParams] = useSearchParams();
   const fetcher = useFetcher();
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editedTerm, setEditedTerm] = useState<any>(null);
+  const [editedTerm, setEditedTerm] = useState<Term | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const currentPage = pagination.currentPage;
   const [isNewTermModalOpen, setIsNewTermModalOpen] = useState(false);
 
-  const handleEdit = (term: any) => {
+  const handleEdit = (term: Term) => {
     setEditingId(term.id);
     setEditedTerm({ ...term });
   };
@@ -193,7 +189,6 @@ export default function Subject() {
                   <input
                     name="phonetic"
                     type="text"
-                    required
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   />
                 </div>
@@ -203,8 +198,8 @@ export default function Subject() {
                   </label>
                   <input
                     name="audio"
-                    type="file"
-                    required
+                    type="text"
+                    placeholder="Enter audio URL"
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   />
                 </div>
@@ -218,6 +213,7 @@ export default function Subject() {
                     required
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   >
+                    <option value="others">Others</option>
                     <option value="noun">Noun</option>
                     <option value="verb">Verb</option>
                     <option value="adjective">Adjective</option>
@@ -382,9 +378,15 @@ export default function Subject() {
                   {editingId === term.id ? (
                     <input
                       className="w-full p-1 border rounded text-sm"
-                      value={editedTerm.term}
+                      value={editedTerm?.term || ""}
                       onChange={(e) =>
-                        setEditedTerm({ ...editedTerm, term: e.target.value })
+                        setEditedTerm((prev) => {
+                          if (!prev) return prev;
+                          return {
+                            ...prev,
+                            term: e.target.value,
+                          };
+                        })
                       }
                     />
                   ) : (
@@ -397,9 +399,15 @@ export default function Subject() {
                   {editingId === term.id ? (
                     <select
                       className="w-full p-1 border rounded text-sm"
-                      value={editedTerm.type}
+                      value={editedTerm?.type || ""}
                       onChange={(e) =>
-                        setEditedTerm({ ...editedTerm, type: e.target.value })
+                        setEditedTerm((prev) => {
+                          if (!prev) return prev;
+                          return {
+                            ...prev,
+                            type: e.target.value,
+                          };
+                        })
                       }
                     >
                       <option value="noun">Noun</option>
@@ -417,11 +425,14 @@ export default function Subject() {
                   {editingId === term.id ? (
                     <textarea
                       className="w-full p-1 border rounded resize-y min-h-[60px] text-sm"
-                      value={editedTerm.definition}
+                      value={editedTerm?.definition || ""}
                       onChange={(e) =>
-                        setEditedTerm({
-                          ...editedTerm,
-                          definition: e.target.value,
+                        setEditedTerm((prev) => {
+                          if (!prev) return prev;
+                          return {
+                            ...prev,
+                            definition: e.target.value,
+                          };
                         })
                       }
                     />
@@ -435,11 +446,14 @@ export default function Subject() {
                   {editingId === term.id ? (
                     <input
                       className="w-full p-1 border rounded text-sm"
-                      value={editedTerm.example}
+                      value={editedTerm?.example || ""}
                       onChange={(e) =>
-                        setEditedTerm({
-                          ...editedTerm,
-                          example: e.target.value,
+                        setEditedTerm((prev) => {
+                          if (!prev) return prev;
+                          return {
+                            ...prev,
+                            example: e.target.value,
+                          };
                         })
                       }
                     />
@@ -529,4 +543,8 @@ type LoaderData = {
     totalPages: number;
   };
   totalItems: number;
+  list: {
+    id: string;
+    name: string;
+  };
 };

@@ -6,7 +6,7 @@ import {
   FiSearch,
   FiUnderline,
 } from "react-icons/fi";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const TEXT_COLORS = [
   { name: "Black", value: "#000000" },
@@ -36,18 +36,17 @@ const HIGHLIGHT_COLORS = [
 ];
 
 export default function OptionsBar({
-  optionsBarRef,
   optionsPosition,
   setShowOptionsBar,
   handleCommentClick,
   handleDictionarySearch,
 }: {
-  optionsBarRef: React.RefObject<HTMLDivElement>;
   optionsPosition: { top: number; left: number };
   setShowOptionsBar: (show: boolean) => void;
   handleCommentClick: () => void;
   handleDictionarySearch: () => void;
 }) {
+  const optionsBarRef = useRef(null);
   const [showTextFormatMenu, setShowTextFormatMenu] = useState(false);
   const [showTextColorPicker, setShowTextColorPicker] = useState(false);
   const [showHighlightColorPicker, setShowHighlightColorPicker] =

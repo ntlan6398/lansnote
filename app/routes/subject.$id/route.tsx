@@ -5,9 +5,12 @@ import {
 } from "@remix-run/node";
 import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { getAuthFromRequest } from "../../auth/auth";
-import { deleteLesson, getLessons } from "./queries";
+// import { deleteLesson, getLessons } from "./queries";
+import { getLessonsbySubjectId, deleteLesson } from "~/queries/lessons";
 import { FaRegFileLines } from "react-icons/fa6";
 import { FaTrash } from "react-icons/fa";
+import dayjs from "dayjs";
+import { useState } from "react";
 export const meta = () => {
   return [{ title: "Subject" }];
 };
@@ -18,8 +21,7 @@ export async function loader({ request, params }: DataFunctionArgs) {
   }
 
   const subjectId = parseInt(params.id as string);
-  // TODO: Add your database query to get subject details and related lessons
-  const lessons = await getLessons(subjectId);
+  const lessons = await getLessonsbySubjectId(subjectId);
   if (!lessons) {
     throw new Error("Subject not found");
   }
@@ -39,6 +41,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 export default function Subject() {
   const { lessons } = useLoaderData();
+  const now = dayjs().format("YYYY-MM-DD");
+  const [today, setToday] = useState(now);
   const fetcher = useFetcher();
   const handleDelete = (lessonId: string) => {
     fetcher.submit(
@@ -49,16 +53,16 @@ export default function Subject() {
     );
   };
   return (
-    <div className="min-h-screen bg-[#F9F7F7]">
+    <div>
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {lessons?.map((lesson) => (
-            <div key={lesson.id} className="relative group bg-[#F9F7F7]">
+            <div key={lesson.id} className="relative group">
               <Link
                 to={`/lesson/${lesson.id}`}
-                className="group flex flex-col items-center p-4 bg-[#F9F7F7] hover:bg-gray-50 rounded-lg transition-colors"
+                className="group flex flex-col items-center p-4  hover:bg-gray-50 rounded-lg transition-colors"
               >
-                <div className="relative mb-2 bg-[#F9F7F7] z-[1]">
+                <div className="relative mb-2  z-[1]">
                   <FaRegFileLines className="w-12 h-12 text-navy-600 group-hover:text-navy-700" />
                 </div>
                 <span
@@ -89,8 +93,12 @@ export default function Subject() {
 
           {/* Add New Lesson Button */}
           <Link
-            to="/lesson/new"
-            className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-colors bg-[#F9F7F7] relative z-[1]"
+            to={`/lesson/new?today=${today}`}
+            className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-colors relative z-[1]"
+            onClick={() => {
+              const now = dayjs().format("YYYY-MM-DD");
+              setToday(now);
+            }}
           >
             <div className="mb-2 z-[1]">
               <svg

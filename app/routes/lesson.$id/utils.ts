@@ -1,10 +1,10 @@
-function checkEndingPunctuation(character) {
+function checkEndingPunctuation(character: string) {
   if (character === "." || character === "!" || character === "?") {
     return true;
   }
   return false;
 }
-function getPartOfSentenceFromEnd(text) {
+function getPartOfSentenceFromEnd(text: string) {
   let start = -1;
   let stop = true;
   do {
@@ -20,7 +20,7 @@ function getPartOfSentenceFromEnd(text) {
   }
   return text;
 }
-function getPartOfSentenceFromStart(text) {
+function getPartOfSentenceFromStart(text: string) {
   let start = 0;
   let stop = true;
   do {
@@ -34,7 +34,7 @@ function getPartOfSentenceFromStart(text) {
   return text.slice(0, start);
 }
 
-function isInAParagraph(text, startOffset) {
+function isInAParagraph(text: string, startOffset: number) {
   const before = text.slice(0, startOffset);
   const after = text.slice(startOffset);
   if (/[.!?]/.test(after)) {
@@ -49,22 +49,21 @@ function isInAParagraph(text, startOffset) {
   return false;
 }
 export function getSelection() {
-  const selection = window.getSelection();
+  const selection = window.getSelection() as Selection;
   const text = selection.toString().trim();
   const range = selection.getRangeAt(0);
-  const getStartOffset = (element, parentElement, startOffset, rangeText) => {
+  const getStartOffset = (
+    element: HTMLElement,
+    parentElement: HTMLElement,
+    startOffset: number,
+    rangeText: string,
+  ) => {
     const textNodes = [];
-    const walk = document.createTreeWalker(
-      element,
-      NodeFilter.SHOW_TEXT,
-      null,
-      false,
-    );
+    const walk = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null);
     const parentWalk = document.createTreeWalker(
       parentElement,
       NodeFilter.SHOW_TEXT,
       null,
-      false,
     );
     const childNode = walk.nextNode();
     let node;
@@ -84,34 +83,37 @@ export function getSelection() {
       index++;
     }
     for (let i = 0; i < trueNode; i++) {
-      startOffset += textNodes[i].textContent.length;
+      startOffset += textNodes[i]?.textContent?.length;
     }
     return startOffset;
   };
-  const getSentence = (container, startOffset) => {
-    const text = container.textContent;
+  const getSentence = (container: HTMLElement, startOffset: number) => {
+    const text = container.textContent || "";
     const before = text.substring(0, startOffset);
     const after = text.substring(startOffset);
-    const beforePart = getPartOfSentenceFromEnd(before, startOffset);
-    const afterPart = getPartOfSentenceFromStart(after, startOffset);
+    const beforePart = getPartOfSentenceFromEnd(before);
+    const afterPart = getPartOfSentenceFromStart(after);
     return beforePart + afterPart;
   };
-  const rangeText = range.startContainer.textContent;
+  const rangeText = range.startContainer.textContent || "";
 
   let startOffset = range.startOffset;
 
-  const container = range.startContainer.parentElement;
+  const container = range.startContainer.parentElement as HTMLElement;
   // Get all text nodes in the container
-  let paragraph = range.startContainer.parentElement;
+  let paragraph = range.startContainer.parentElement as HTMLElement;
   if (paragraph === container) {
     startOffset = getStartOffset(container, paragraph, startOffset, rangeText);
   }
   let continuing = true;
-  while (!isInAParagraph(paragraph.textContent, startOffset) && continuing) {
-    if (paragraph.parentElement.getAttribute("id") === "content") {
+  while (
+    !isInAParagraph(paragraph.textContent || "", startOffset) &&
+    continuing
+  ) {
+    if (paragraph.parentElement?.getAttribute("id") === "content") {
       continuing = false;
     } else {
-      paragraph = paragraph.parentElement;
+      paragraph = paragraph.parentElement as HTMLElement;
       startOffset = getStartOffset(
         container,
         paragraph,
@@ -123,7 +125,12 @@ export function getSelection() {
   const sentence = getSentence(paragraph, startOffset);
   return { text, sentence };
 }
-export const highLightRange = (range, id, text, partOfSpeech) => {
+export const highLightRange = (
+  range: Range,
+  id: string,
+  text: string,
+  partOfSpeech: string,
+) => {
   const span = document.createElement("span");
   span.setAttribute("data-comment", "true");
   span.setAttribute("data-term-id", id);
