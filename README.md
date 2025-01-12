@@ -1,7 +1,5 @@
 # LANSNOTE
 
-#### Video Demo: [LANSNOTE](https://www.youtube.com/watch?v=P3yI7uEqLDs)
-
 #### Description:
 
 This is a modern web application designed to help users learn English through interactive lessons, flashcards, and a dynamic dictionary system. Built using React and Remix, it provides an engaging platform for language learners to study and practice vocabulary effectively.
