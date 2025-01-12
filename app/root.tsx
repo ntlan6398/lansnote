@@ -31,7 +31,7 @@ import { getSubjectsByUserId, addSubject } from "~/queries/subjects";
 import "./styles.css";
 import { useState } from "react";
 import dayjs from "dayjs";
-import { List } from "@prisma/client";
+import { Subject, List } from "@prisma/client";
 
 export function shouldRevalidate({ formAction }: ShouldRevalidateFunctionArgs) {
   return formAction && ["/login", "/signup", "logout"].includes(formAction);

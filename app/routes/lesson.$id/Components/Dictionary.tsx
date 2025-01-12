@@ -105,6 +105,21 @@ export default function Dictionary({
                 <img src={logo} alt={name} className="w-4 h-4" />
               </a>
             ))}
+            <button
+              onClick={() =>
+                handleAddCommentFromDefinition(
+                  dictionaryData?.[0]?.word || selectedText,
+                  "",
+                  "others",
+                  "",
+                  "",
+                )
+              }
+              className="text-gray-500 hover:text-gray-700 px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded"
+              title="Add comment"
+            >
+              <FiMessageSquare className="w-4 h-4" />
+            </button>
           </div>
           <button
             onClick={() => setShowDictionaryPopup(false)}

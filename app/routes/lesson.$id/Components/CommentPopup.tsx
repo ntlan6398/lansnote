@@ -126,13 +126,13 @@ export default function CommentPopup({
         <div className="relative">
           <label className="block text-sm font-medium text-gray-700 flex items-center gap-1 mb-1">
             Definition
-            <button
+            {/* <button
               onClick={handleDictionarySearch}
               className="p-1 hover:bg-gray-100 rounded-full"
               title="Search in Dictionary"
             >
               <FiSearch className="w-4 h-4" />
-            </button>
+            </button> */}
           </label>
           <textarea
             name="definition"
