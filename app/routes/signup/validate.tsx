@@ -11,7 +11,8 @@ export async function validate(email: string, password: string) {
 
   if (!password) {
     errors.password = "Password is required.";
-  }
+  } 
+  console.log(12)
 
   if (!errors.email && (await accountExists(email))) {
     errors.email = "An account with this email already exists.";
